@@ -1,6 +1,6 @@
 # Sales
 
-Module group `sales`. 23 screens in the standard menu.
+Module group `sales`. 25 screens in the standard menu.
 
 ## Behaviours
 
@@ -22,10 +22,16 @@ Module group `sales`. 23 screens in the standard menu.
 - With departments or projects on, quotations, orders, deliveries, invoices, returns, down payments and receipts carry a department and a project on the header and on every line and charge. A line's own wins; a line that names none, and the document's own legs (receivable or payable, tax, down payments), take the header's. A document made from another, or a line pulled from one, keeps its source's tags; the income statement filtered by a department shows its revenue and cost of sales.
 - "Discount on the total" is spread over the lines in proportion; each line's revenue, cost, commission and the sales reports are net of its share.
 - In a foreign currency (Multiple currencies on and a foreign currency active): a customer's currency opens their documents in it, at the rate on the document's date from the Currencies screen; the rate (and, for VAT, the Minister of Finance's tax rate) can be changed per document. Prices, charges, down payments and receipts are typed in the document's currency and kept beside the rupiah amounts, which are the document's at its rate and are what the ledger, tax and reports read; VAT is computed in rupiah at the tax rate. Lines are pulled only from documents in the same currency, and a document made from another keeps its currency. A receipt settles documents in its own currency only; the receivable leaves at the value it was booked at and the difference to what was received is a realised exchange gain or loss (Preferences → Accounts). A giro in a foreign currency is refused.
+- Customer Types (Central) are the kinds of customer (seeded Bengkel, Toko Sparepart, Distributor) and the terms each trades on: a price tier whose adjustments and blanket discount are the type's promo, a payment term for the due days of its invoices, and a credit age limit of its own; the company's notice and freeze days stay the same for every type. Setting or changing a customer's type copies the type's terms onto the customer, overwriting what was there (a blank term on the type leaves the customer's own); "Re-apply type terms" does it again for every customer of the type. Every copy is logged with the values before and after.
+- An invoice ages (Central) from the day its order was accepted: the approval of the order by the customer's marketing seat or an administrator, stamped on the invoice when it is made from its order or its delivery's order; an invoice with no order behind it ages from its own date. The due date is the payment term counted from that day, and the notice, the freeze, the collection desk, the AR aging report and the invoice list's age all count from it.
+- Delivery Watch (Central): thirty days after an order was accepted (`client.orders.watch_days`), `central:delivery-watch` reports it once, in one morning digest to every active administrator and the customer's marketing seat, by bell and by mail: delivered, partly delivered with the delivery numbers, or not yet delivered and which warehouse holds the goods. Nothing is released; the admin rejects or edits the order. The screen lists every accepted order past the watch days with what became of its goods and when it was reported; the calendar marks the day an undelivered order crosses the line.
+- Prints (Central): the delivery prints as the Surat Jalan (item code, quantity, unit, item name, the expedition and the delivery's note in the box, Collected by / Checked and packed by / Warehouse head signature, who printed it and when; no price; three labelled copies) or as the Surat Pengantar slip (the mark and phone, number and date, Tuan/Toko and the delivery address, the vehicle and its plate, the package counts by kind, the goods, Penerima / Hormat kami); the Invoice Exchange prints as the Tanda Terima Faktur (the invoices handed over, their dates, due dates and amounts, the collect date, Handed over by / Received by). A print layout may name its own template; the base's page stays the default. The warehouse enters the expedition (Ekspedisi, the Shipping Methods master), the vehicle, the plate, the package counts, a note and a goods description at Deliver; the delivery keeps the order's expedition, FOB and ship date. Deliveries number SJ-.
+- Birthdays (Central): a customer's contact person carries a birth date, personal data under UU PDP, exported with the customer's other data and never mailed to the customer. Three days before and on the day, `central:birthdays` sends the customer's team and the administrators a bell and a mail, once per contact and year for each; the calendar shows the birthday to whoever may open Customers, within their branches.
 
 ## Screens
 
 - [Order Approvals](#order-approvals)
+- [Delivery Watch](#delivery-watch)
 - [Settlement Claims](#settlement-claims)
 - [Collections](#collections)
 - [Return Claims](#return-claims)
@@ -46,6 +52,7 @@ Module group `sales`. 23 screens in the standard menu.
 - [e-Commerce Links](#e-commerce-links) (not reproduced)
 - [Check-ins](#check-ins)
 - [Customer Prices](#customer-prices)
+- [Customer Types](#customer-types)
 - [Customer Teams](#customer-teams)
 - [Buyer Accounts](#buyer-accounts)
 
@@ -58,6 +65,18 @@ Menu key `client__order-approvals` · module `central-orders`
 **Columns:** Customer · Order No. · Date · Branch · Total · Free credit · Stock
 
 **Actions:** Open · Approve · Reject
+
+## Delivery Watch
+
+Menu key `client__delivery-watch` · module `central-orders`
+
+### List
+
+**Columns:** Number · Customer · Accepted on · Age (days) · Goods · Delivered / ordered · Held in · Reported on
+
+**Filters:** Goods
+
+**Actions:** Open order
 
 ## Settlement Claims
 
@@ -119,7 +138,7 @@ Menu key `client__return-claims` · module `central-claims`
 
 **Section: What comes back**
 
-**Line grid "Lines":** Invoice line · Quantity
+**Line grid "Lines":** Invoice line · Quantity · Condition
 
 ## Sales Quotations
 
@@ -505,7 +524,7 @@ Menu key `customer__exchange-invoice` · module `sales`
 
 **Filters:** Trans date · Collect date · Customer
 
-**Actions:** Edit
+**Actions:** Print · Edit
 
 ### Form
 
@@ -572,7 +591,7 @@ Menu key `customer__customer` · module `sales`
 
 ### List
 
-**Columns:** Name · Primary contact · Customer ID · Category · Price category · Discount category · Tax address · Branch · Address · Payment term · Credit limit
+**Columns:** Name · Primary contact · Customer ID · Category · Customer type · Price category · Discount category · Tax address · Branch · Address · Payment term · Credit limit
 
 **Filters:** Active · Category · Branch
 
@@ -612,7 +631,7 @@ Menu key `customer__customer` · module `sales`
 
 #### Tab: Contacts
 
-**Line grid "Contacts":** Full name · Position · Email · Mobile
+**Line grid "Contacts":** Full name · Position · Email · Mobile · Birthday
 
 #### Tab: Shipping
 
@@ -636,6 +655,7 @@ Menu key `customer__customer` · module `sales`
 
 | Field | Column | Type | Required |
 |---|---|---|---|
+| Customer type | `customer_type_id` | select |  |
 | Price category | `price_category_id` | select |  |
 | Discount category | `discount_price_category_id` | select |  |
 | Default salesperson | `salesman_id` | select |  |
@@ -885,6 +905,30 @@ Menu key `client__customer-prices` · module `central-price-list`
 | Effective from | `effective_from` | date |  |
 | Effective until | `effective_until` | date |  |
 | Reason | `reason` | text | yes |
+| Active | `is_active` | toggle |  |
+
+## Customer Types
+
+Menu key `client__customer-types` · module `central-customers`
+
+### List
+
+**Columns:** Code · Name · Price tier · Payment term · Age limit (days) · Customers · Active
+
+**Filters:** Active
+
+**Actions:** Edit · Re-apply type terms · Delete
+
+### Form
+
+| Field | Column | Type | Required |
+|---|---|---|---|
+| Code | `code` | text | yes |
+| Name | `name` | text | yes |
+| Price tier (the promo) | `price_category_id` | select |  |
+| Payment term | `payment_term_id` | select |  |
+| Block when an invoice is older than (days) | `credit_limit_age_days` | number |  |
+| Description | `description` | text |  |
 | Active | `is_active` | toggle |  |
 
 ## Customer Teams

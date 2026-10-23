@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Client;
 
+use App\Client\Domain\Debt\AcceptanceAging;
 use App\Client\Domain\Ops\Alerts\NullSender;
 use App\Client\Domain\Ops\Alerts\WhatsAppSender;
 use App\Client\Domain\Ops\Backup\BackupCipher;
@@ -17,6 +18,7 @@ use App\Client\Portal\PortalPanelProvider;
 use App\Client\Site\Http\SiteContentSecurityPolicy;
 use App\Client\Site\Http\SiteLocale;
 use App\Client\Site\SiteSettings;
+use App\Domain\Sales\Contracts\AgingDate;
 use App\Domain\Sales\Contracts\Prices;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +51,8 @@ class ClientServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/config/claims.php', 'claims');
         $this->mergeConfigFrom(__DIR__.'/config/portal.php', 'portal');
         $this->mergeConfigFrom(__DIR__.'/config/site.php', 'site');
+        $this->mergeConfigFrom(__DIR__.'/config/orders.php', 'orders');
+        $this->mergeConfigFrom(__DIR__.'/config/stock.php', 'stock');
         $this->mergeConfigFrom(__DIR__.'/config/ops.php', 'ops');
         // The buyer portal: a second panel on the customer guard (sub-project 4).
         $this->app->register(PortalPanelProvider::class);
@@ -61,7 +65,7 @@ class ClientServiceProvider extends ServiceProvider
         $this->app->bind(FileArchiver::class, fn () => FileArchiver::fromConfig());
         // Every selling line is priced by Central's rules: customer deals, the tier, the list in force.
         $this->app->bind(Prices::class, CentralPrices::class);
-        // WhatsApp alerts: the sender for the configured provider, none until one is chosen (sub-project 7).
+        // WhatsApp alerts: the sender for the configured provider, none until one is chosen (sub-project 11).
         $this->app->bind(WhatsAppSender::class, fn () => match (trim((string) config('ops.whatsapp.provider'))) {
             default => new NullSender,
         });
@@ -77,6 +81,7 @@ class ClientServiceProvider extends ServiceProvider
                 'replace_placeholders' => true,
             ]);
         }
+        $this->app->bind(AgingDate::class, AcceptanceAging::class); // an invoice ages from its order's approval
     }
 
     public function boot(): void

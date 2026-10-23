@@ -16,6 +16,7 @@ Module group `settings`. 10 screens in the standard menu.
 - The access window: an administrator may always work; an operator may when any of their groups allows the moment, either by the group's own time window or, for groups that follow Preferences, by the Restrictions tab (not restricted, restricted for everyone, or a time window). A window whose end is before its start runs past midnight. Outside it every page answers "access closed" with the hours.
 - Seeded groups: only Administrator and Accounting may back-date and delete posted transactions.
 - Six groups are seeded (Administrator, Accounting, Finance, Sales, Purchasing, Warehouse); the client reshapes them on the Access Groups screen.
+- Central's roles (Central) claim these groups by a stable role key: Administrator, Finance (keuangan), Purchasing (pembelian: stock, catalogue, price list and the purchasing chain; the money of a purchase stays with Finance), Warehouse (gudang), Marketing (penjualan) and Sales, plus the Portal group the portal writes under. The owner may rename a role group; it cannot be deleted. The seeder shapes a group once and leaves alone a group shaped since; `central:reshape-groups` re-applies the matrix on purpose, audited, and merges a company's old Inventory group into Purchasing with its members.
 - Numbering is configured per document type: a pattern of tokens (prefix, year, month, counter), the counter width, and when it resets; several series per type, one of them the default, each limited to chosen users or open to all.
 - Print layouts are designed per document type: which blocks print, the heading, the footer, paper and orientation; one default per type.
 - Approval rules (Transaction Approvers) say which documents need approval, from what amount, in which branch, for whose entries, by whom (users or groups) and under which condition: any one approver; at least two different people; every approver in any order; every approver in a set order. A group's place is filled by any one of its members. Only the document types a module registers are offered: quotations, orders, deliveries, invoices and returns on both sides, requisitions, goods receipts, vendor claims and payments, cash and bank vouchers and transfers, journal vouchers, expense accruals, inventory adjustments, item transfers and stock counts.
@@ -186,19 +187,6 @@ Menu key `company__access-privilege` · module `settings`
 
 #### Tab: Screen rights
 
-**Section: Settings**
-
-| Field | Column | Type | Required |
-|---|---|---|---|
-| Preferences | `rights.company__preferences` | checkbox list |  |
-| Access Groups | `rights.company__access-privilege` | checkbox list |  |
-| Users | `rights.company__user-company` | checkbox list |  |
-| Numbering | `rights.company__auto-number` | checkbox list |  |
-| Print Layouts | `rights.company__print-layout` | checkbox list |  |
-| Transaction Approvers | `rights.company__user-approval` | checkbox list |  |
-| Operations | `rights.client__operations` | checkbox list |  |
-| Launch Readiness | `rights.client__launch-readiness` | checkbox list |  |
-
 **Section: Company**
 
 | Field | Column | Type | Required |
@@ -221,6 +209,7 @@ Menu key `company__access-privilege` · module `settings`
 | Activity Log | `rights.company__audit` | checkbox list |  |
 | Website | `rights.client__website` | checkbox list |  |
 | Website Images | `rights.client__site-images` | checkbox list |  |
+| Year-end Close | `rights.client__year-end` | checkbox list |  |
 
 **Section: General Ledger**
 
@@ -253,6 +242,7 @@ Menu key `company__access-privilege` · module `settings`
 | Field | Column | Type | Required |
 |---|---|---|---|
 | Order Approvals | `rights.client__order-approvals` | checkbox list |  |
+| Delivery Watch | `rights.client__delivery-watch` | checkbox list |  |
 | Settlement Claims | `rights.client__settlement-claims` | checkbox list |  |
 | Collections | `rights.client__collections` | checkbox list |  |
 | Return Claims | `rights.client__return-claims` | checkbox list |  |
@@ -272,6 +262,7 @@ Menu key `company__access-privilege` · module `settings`
 | Sales Targets | `rights.budget-target__sales-target` | checkbox list |  |
 | Check-ins | `rights.customer__sales-check-in` | checkbox list |  |
 | Customer Prices | `rights.client__customer-prices` | checkbox list |  |
+| Customer Types | `rights.client__customer-types` | checkbox list |  |
 | Customer Teams | `rights.client__teams` | checkbox list |  |
 | Buyer Accounts | `rights.client__buyer-accounts` | checkbox list |  |
 
@@ -297,6 +288,8 @@ Menu key `company__access-privilege` · module `settings`
 | Field | Column | Type | Required |
 |---|---|---|---|
 | Fulfilment | `rights.client__fulfilment` | checkbox list |  |
+| Count Sheets | `rights.client__count-sheets` | checkbox list |  |
+| Damaged Goods | `rights.client__damaged-goods` | checkbox list |  |
 | Purchase Requisitions | `rights.vendor__purchase-requisition` | checkbox list |  |
 | Item Transfers | `rights.inventory__item-transfer` | checkbox list |  |
 | Inventory Adjustments | `rights.inventory__item-adjustment` | checkbox list |  |
@@ -311,6 +304,7 @@ Menu key `company__access-privilege` · module `settings`
 | Stock by Warehouse | `rights.inventory__stock-warehouse` | checkbox list |  |
 | Minimum Stock | `rights.inventory__minimum-stock-item` | checkbox list |  |
 | Price List | `rights.client__price-list` | checkbox list |  |
+| Stock Age | `rights.client__stock-age` | checkbox list |  |
 | Warehouse Accounts | `rights.client__warehouse-accounts` | checkbox list |  |
 
 **Section: Fixed Assets**
@@ -337,10 +331,24 @@ Menu key `company__access-privilege` · module `settings`
 
 | Field | Column | Type | Required |
 |---|---|---|---|
+| Product Analytics | `rights.client__product-analytics` | checkbox list |  |
 | Report Catalogue | `rights.report__report` | checkbox list |  |
 | VAT Return | `rights.report__spt-masa` | checkbox list |  |
 | Income Tax Art. 21 Return | `rights.report__formulir-1721-induk` | checkbox list |  |
 | Withholding Slips | `rights.report__formulir-1721-bukti-potong` | checkbox list |  |
+
+**Section: Settings**
+
+| Field | Column | Type | Required |
+|---|---|---|---|
+| Preferences | `rights.company__preferences` | checkbox list |  |
+| Access Groups | `rights.company__access-privilege` | checkbox list |  |
+| Users | `rights.company__user-company` | checkbox list |  |
+| Numbering | `rights.company__auto-number` | checkbox list |  |
+| Print Layouts | `rights.company__print-layout` | checkbox list |  |
+| Transaction Approvers | `rights.company__user-approval` | checkbox list |  |
+| Operations | `rights.client__operations` | checkbox list |  |
+| Launch Readiness | `rights.client__launch-readiness` | checkbox list |  |
 
 #### Tab: Special rights
 

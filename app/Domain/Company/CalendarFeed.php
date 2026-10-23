@@ -32,6 +32,29 @@ final class CalendarFeed
     }
 
     /** @return array<string, list<array{kind: string, title: string, url: ?string}>> date → events, for any range (a week, the agenda) */
+    /** @var list<callable(CarbonImmutable, CarbonImmutable, callable(string, string, string, ?string=): void): void> */
+    private static array $feeders = [];
+
+    /** @var array<string, array{label: string|\Closure, colour: string}> */
+    private static array $extraKinds = [];
+
+    /**
+     * A module adds its own events: the feeder is called with the range and the same $add(date, kind, title, url)
+     * the base uses, and its kind joins the legend with the label and colour given.
+     */
+    public static function extend(string $kind, string|\Closure $label, string $colour, callable $feeder): void
+    {
+        self::$extraKinds[$kind] = ['label' => $label, 'colour' => $colour];
+        self::$feeders[] = $feeder;
+    }
+
+    /** The kinds a module added, for the legend. @return array<string, array{label: string, colour: string}> */
+    public static function extraKinds(): array
+    {
+        // A label given as a closure is read in the viewer's language, not the language of the boot.
+        return array_map(fn (array $kind) => ['label' => $kind['label'] instanceof \Closure ? (string) ($kind['label'])() : $kind['label'], 'colour' => $kind['colour']], self::$extraKinds);
+    }
+
     public static function between(CarbonImmutable $from, CarbonImmutable $until): array
     {
         $events = [];
@@ -75,6 +98,9 @@ final class CalendarFeed
         $monthEnd = app(ModuleRegistry::class)->isEnabled('fixed-assets') ? __('Month end: close the period and run depreciation') : __('Month end: close the period');
         for ($end = $from->endOfMonth()->startOfDay(); $end->lte($until); $end = $end->addDay()->endOfMonth()->startOfDay()) {
             $add($end->toDateString(), 'period', $monthEnd);
+        }
+        foreach (self::$feeders as $feeder) {
+            $feeder($from, $until, $add);
         }
         ksort($events);
 

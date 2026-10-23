@@ -1,7 +1,9 @@
 <?php
 
+use App\Client\Modules\BooksModule;
 use App\Client\Modules\ClaimsModule;
 use App\Client\Modules\CollectionsModule;
+use App\Client\Modules\CustomersModule;
 use App\Client\Modules\OpsModule;
 use App\Client\Modules\OrdersModule;
 use App\Client\Modules\PortalModule;
@@ -29,12 +31,14 @@ return [
     'modules' => [
         OrdersModule::class,
         PriceListModule::class,
+        CustomersModule::class,
         ClaimsModule::class,
         CollectionsModule::class,
         WarehouseModule::class,
         PortalModule::class,
         SiteModule::class,
         OpsModule::class,
+        BooksModule::class,
     ],
 
     // Central's own screen keys: string-backed enums implementing
@@ -60,6 +64,10 @@ return [
         'colors' => [
             // 'primary' => '#0f766e',
         ],
+        // The company's mark, files under public/, shown beside the name in the panel's header
+        // and on the public site; the dark twin is the same paths in the light blue of a dark ground.
+        'logo' => 'images/logo.svg',
+        'logo_dark' => 'images/logo-dark.svg',
     ],
 
 ];

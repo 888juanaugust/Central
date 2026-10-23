@@ -185,7 +185,8 @@ If a change appears to require breaking one, stop and ask.
 5. **Stock is per warehouse, costed by moving average, and every movement carries its
    document date.** A back-dated or edited document re-costs what came after it, never
    before the first open period. Stock is **reserved when an order is approved and leaves
-   when it is delivered**; a job releases the reservations of stale unbilled orders.
+   when it is delivered**; nothing expires: thirty days after the acceptance the delivery watch
+   reports an order whose goods have not all gone out, and the admin rejects or edits it.
 6. **Units are modelled.** An item has a base unit (PCS or SET) and any number of other
    units with conversion ratios (`qty_per_ctn` for cartons); document lines store the
    entered unit and quantity and the base quantity; the stock ledger is always in base
@@ -230,10 +231,18 @@ warehouses. Central's seeded groups are its roles:
 |---|---|---|
 | Sales | Check-ins, orders for own customers, see prices, file pelunasan-piutang claims, returns and expense claims for own customers, customer insight | Approve credit, record payment, see cost, verify anything they filed |
 | Marketing | **Global — reads every branch.** Approve/reject orders of own customers, watch their debt, file pelunasan claims, erase draft orders | Set prices, record payment, see cost |
-| Inventory | Stock work, catalogue, price list, stock statistics incl. cost, post returns | See customer credit data |
+| Purchasing (pembelian) | Stock work, catalogue, price list, stock statistics incl. cost, post returns, the purchasing chain (orders, receipts, returns, vendors, vendor prices) | See customer credit data; purchase invoices and vendor payments (Finance's) |
 | Warehouse (gudang) | **Bound to one warehouse, one active account per warehouse.** Its warehouse's fulfilment queue, pick list, surat jalan, deliver | Anything outside its warehouse; cost; credit; catalogue; orders |
-| Finance | Record receipts and payments, verify claims, manage credit and AR, books, commission rates and targets, tax export | Edit prices, issue credit notes |
+| Finance (keuangan) | Record receipts and payments, verify claims, manage credit and AR, books, month-end close, fixed assets, commission rates and targets, tax export | Edit prices, issue credit notes, reopen a closed period |
 | Owner (Administrator) | Everything + activity log, branches, staff, teams | Verify a claim they themselves filed |
+| Customer | The buyer portal only: a `customer_users` login on the `customer` guard, invited from Buyer Accounts | The staff panel |
+
+Code reads a role through `App\Client\Access\CentralGroups` by the group's `role_key`
+(administrator, finance, purchasing, warehouse, marketing, sales, portal), never by its
+name: the Owner may rename a group (Keuangan, Pembelian, Gudang, Penjualan) on the Access
+Groups screen; a role group cannot be deleted. `CentralGroupSeeder` shapes the groups
+once; `central:reshape-groups` re-applies the matrix to an installed company, audited.
+The base's Accounting group stays as the base seeds it and is not a Central role.
 
 One sales + one marketing form the **team** of a customer (`sales_user_id` /
 `marketing_user_id`, assigned only by the Owner through `TeamAssigner`, audited). The
@@ -245,7 +254,10 @@ records money. Whoever files a claim (pelunasan, return, expense) never verifies
 keys, two people, the Owner included. Every override is logged with actor, old value, new
 value, timestamp.
 
-**Debt terms.** Invoice due date defaults to 30 days. Aging counts from the issue date:
+**Debt terms.** Invoice due date defaults to 30 days. Aging counts from the acceptance: the day
+the order behind the invoice was approved (`sales_invoices.accepted_at`, stamped from
+`sales_orders.approved_at` through the `AgingDate` seam; an invoice with no order ages from its
+own date), and the due date is the term counted from it:
 notice to customer and team at 120 days, hard freeze — no new transactions — strictly
 after 150 days, lifted the moment the aged invoice settles. Derived arithmetic through
 the base's `CreditCheck` preferences, never stored state.

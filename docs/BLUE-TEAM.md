@@ -1,7 +1,7 @@
 # Defending the server
 
 One VPS runs the books, so one VPS is what an attacker wants. This page is the runbook
-of sub-project 7 (`docs/superpowers/specs/2026-10-23-blue-team-design.md`): what is
+of sub-project 11 (`docs/superpowers/specs/2026-10-23-blue-team-design.md`): what is
 watched, where an alert goes, how to apply the kit, what to check each month and each
 quarter, and what to do the day something is wrong. [DEPLOY.md](DEPLOY.md) is the
 server itself; this page is its defence.

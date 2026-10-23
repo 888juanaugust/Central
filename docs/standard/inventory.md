@@ -1,6 +1,6 @@
 # Inventory
 
-Module group `inventory`. 16 screens in the standard menu.
+Module group `inventory`. 19 screens in the standard menu.
 
 ## Behaviours
 
@@ -12,10 +12,15 @@ Module group `inventory`. 16 screens in the standard menu.
 - Order fulfilment shows what is ordered and not yet delivered, and what stock on hand and open purchase orders cannot cover ("need to order", the earliest orders served first); stock by warehouse the quantity and value per item per warehouse.
 - Minimum stock lists the items at or below their minimum: the warehouse's own minimum when one is set on the item, else the item's overall minimum. Beside stock on hand it shows what approved, open purchase orders still bring (on order) and what approved, open requisitions still ask for (requested), and the quantity to order to get back to the minimum. Selected items open a purchase order (their preferred vendor, when they share one) or a requisition with those lines.
 - With departments or projects on, inventory adjustments carry a department and a project on the header and per line, so a write-off reads against the department that made it. Transfers between warehouses carry none.
+- Stock Age (Central) reads how old the stock on hand is from the ledger: every receipt opens a layer dated the day it entered the warehouse (a transfer's goods on the receive date, a return on its date, opening stock on its date; a value adjustment opens none), every issue takes the oldest layers first, and what remains is the stock on hand with its age; one row per item and warehouse with the oldest layer, the quantity in each bucket (0–30, 31–90, 91–180, 181–365, over 365 days) and the value at the average cost. A gudang account sees its own warehouse; the value needs the "see cost" right. Nothing is stored; the books keep their moving average.
+- Count Sheets (Central) are the counts on a cadence: every working evening `central:opname-sheets` drafts, per warehouse, a Stock Opname Order of kind daily and its result holding only the SKUs that went out of that warehouse that day (the system quantity snapshotted as the base's Pull does); on the first day of January and July a semester sheet holds every SKU the warehouse has had. Sheets are written in the System user's name (no person holds its password; under segregation of duties it never approves). The gudang counts its own warehouse's sheets on the screen; Purchasing approves, which posts the variance as the base does. `central:count-reminders` every morning tells the gudang and Purchasing of sheets past their day not yet counted, and Purchasing of counts waiting for approval, by bell and mail; sheets due show in the calendar. A manual count still lives on the base's Stock Opname screens.
+- Damaged goods (Central): a return claim line is good or damaged; the filer suggests, the verifier decides. A damaged line enters the branch's damaged-goods warehouse (Gudang Rusak, one per cabang, flagged "damaged goods"; verification refuses without one) and the customer is credited in full as for any return. Damaged stock never counts as available to the portal, the reservations or the order splitter, and the Fulfilment screen never ships from it. Damaged Goods lists what sits there with its age and the return it last came from; Purchasing writes it off (a negative inventory adjustment on the loss account, 6600 Damaged Goods Loss by default, made in the chart when missing) or returns it to the vendor by hand.
 
 ## Screens
 
 - [Fulfilment](#fulfilment)
+- [Count Sheets](#count-sheets)
+- [Damaged Goods](#damaged-goods)
 - [Purchase Requisitions](#purchase-requisitions)
 - [Item Transfers](#item-transfers)
 - [Inventory Adjustments](#inventory-adjustments)
@@ -30,6 +35,7 @@ Module group `inventory`. 16 screens in the standard menu.
 - [Stock by Warehouse](#stock-by-warehouse)
 - [Minimum Stock](#minimum-stock)
 - [Price List](#price-list)
+- [Stock Age](#stock-age)
 - [Warehouse Accounts](#warehouse-accounts)
 
 ## Fulfilment
@@ -43,6 +49,28 @@ Menu key `client__fulfilment` · module `central-warehouse`
 **Filters:** Warehouse
 
 **Actions:** Pick list · Deliver
+
+## Count Sheets
+
+Menu key `client__count-sheets` · module `central-warehouse`
+
+### List
+
+**Columns:** Number · Kind · Warehouse · Date · Items · Counted · Status
+
+**Filters:** Status
+
+**Actions:** Count · Approve · Open
+
+## Damaged Goods
+
+Menu key `client__damaged-goods` · module `central-warehouse`
+
+### List
+
+**Columns:** Item code · Item name · Warehouse · On hand · Age (days) · From return
+
+**Actions:** Write off · Return to vendor
 
 ## Purchase Requisitions
 
@@ -488,6 +516,23 @@ Menu key `client__price-list` · module `central-price-list`
 | Effective from | `effective_from` | date | yes |
 | This file replaces the whole list | `is_full_replacement` | toggle |  |
 | Notes | `note` | textarea |  |
+
+## Stock Age
+
+Menu key `client__stock-age` · module `central-warehouse`
+
+### Filters and inputs
+
+| Field | Column | Type | Required |
+|---|---|---|---|
+| Warehouse | `warehouse_id` | select |  |
+| Category | `category_id` | select |  |
+| Brand | `brand_id` | select |  |
+| Age | `bucket` | select |  |
+
+### List
+
+**Columns:** Item code · Item name · Warehouse · On hand · Oldest since · Age (days) · Bucket · 0–30 days · 31–90 days · 91–180 days · 181–365 days · over 365 days
 
 ## Warehouse Accounts
 

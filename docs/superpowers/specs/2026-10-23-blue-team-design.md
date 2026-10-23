@@ -1,6 +1,6 @@
 # Blue team — design
 
-Sub-project 7 of `docs/ROADMAP.md`. Status: approved 2026-10-23; built 2026-10-23.
+Sub-project 11 of `docs/ROADMAP.md`. Status: approved 2026-10-23; built 2026-10-23.
 
 ## Goal
 

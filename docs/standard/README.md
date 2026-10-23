@@ -41,16 +41,16 @@ Confirm with the client's accountant before relying on these figures:
 
 | Module group | Switchable modules in it | Screens | Page |
 |---|---|---|---|
-| Settings | `settings` (always on)<br>`approval` (Preferences → Features → Transaction approval)<br>`central-ops` (always on) | 8 | [settings.md](settings.md) |
-| Company | `company` (always on)<br>`departments` (Preferences → Features → Departments)<br>`projects` (Preferences → Features → Projects)<br>`payroll` (Preferences → Features → Payroll entries and salary components)<br>`central-site` (always on) | 18 | [company.md](company.md) |
+| Company | `company` (always on)<br>`departments` (Preferences → Features → Departments)<br>`projects` (Preferences → Features → Projects)<br>`payroll` (Preferences → Features → Payroll entries and salary components)<br>`central-site` (always on)<br>`central-books` (always on) | 19 | [company.md](company.md) |
 | General Ledger | `general-ledger` (always on)<br>`payroll` (Preferences → Features → Payroll entries and salary components)<br>`budgets` (Preferences → Features → Budgets and targets) | 9 | [general-ledger.md](general-ledger.md) |
 | Cash & Bank | `central-claims` (always on)<br>`cash-bank` (always on) | 7 | [cash-bank.md](cash-bank.md) |
-| Sales | `central-orders` (always on)<br>`central-claims` (always on)<br>`central-collections` (always on)<br>`sales` (always on)<br>`sales-extras` (Preferences → Features → Sales extras: check-ins, commissions, targets)<br>`central-price-list` (always on)<br>`central-portal` (always on) | 22 | [sales.md](sales.md) |
+| Sales | `central-orders` (always on)<br>`central-claims` (always on)<br>`central-collections` (always on)<br>`sales` (always on)<br>`sales-extras` (Preferences → Features → Sales extras: check-ins, commissions, targets)<br>`central-price-list` (always on)<br>`central-customers` (always on)<br>`central-portal` (always on) | 24 | [sales.md](sales.md) |
 | Purchasing | `purchasing` (always on) | 12 | [purchasing.md](purchasing.md) |
-| Inventory | `central-warehouse` (always on)<br>`purchasing` (always on)<br>`inventory` (always on)<br>`central-price-list` (always on) | 16 | [inventory.md](inventory.md) |
+| Inventory | `central-warehouse` (always on)<br>`purchasing` (always on)<br>`inventory` (always on)<br>`central-price-list` (always on) | 19 | [inventory.md](inventory.md) |
 | Fixed Assets | `fixed-assets` (Preferences → Features → Fixed assets) | 7 | [fixed-assets.md](fixed-assets.md) |
 | Tax | `tax` (Preferences → Features → Tax) | 3 | [tax.md](tax.md) |
-| Reports | `reports` (always on)<br>`tax` (Preferences → Features → Tax)<br>`payroll` (Preferences → Features → Payroll entries and salary components) | 4 | [reports.md](reports.md) |
+| Reports | `central-warehouse` (always on)<br>`reports` (always on)<br>`tax` (Preferences → Features → Tax)<br>`payroll` (Preferences → Features → Payroll entries and salary components) | 5 | [reports.md](reports.md) |
+| Settings | `settings` (always on)<br>`approval` (Preferences → Features → Transaction approval)<br>`central-ops` (always on) | 8 | [settings.md](settings.md) |
 
 ## How to read a page
 

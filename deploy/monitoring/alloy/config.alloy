@@ -1,0 +1,93 @@
+// What Alloy ships to Loki on this box, and under which labels:
+//   job="journal"           sshd, CrowdSec and its bouncer, supervisor, docker, cron, and sudo
+//   job="caddy"             Caddy's JSON access logs (the site and the monitor)
+//   job="laravel"           the application log, one entry per multi-line record
+//   job="central-security"  one JSON line per sign-in event (RecordsAuthEvents)
+//   job="auditd"            the audit trail of the files that decide access
+// Alloy runs as root with every path mounted read-only (docker-compose.yml).
+
+loki.write "local" {
+  endpoint {
+    url = "http://127.0.0.1:3100/loki/api/v1/push"
+  }
+}
+
+// --- the journal -------------------------------------------------------------
+loki.relabel "journal" {
+  forward_to = []
+
+  rule {
+    source_labels = ["__journal__systemd_unit"]
+    target_label  = "unit"
+  }
+  rule {
+    source_labels = ["__journal_syslog_identifier"]
+    target_label  = "identifier"
+  }
+  rule {
+    source_labels = ["unit", "identifier"]
+    separator     = ";"
+    regex         = "(ssh|crowdsec|crowdsec-firewall-bouncer|supervisor|docker|cron|unattended-upgrades)\\.service;.*|.*;sudo"
+    action        = "keep"
+  }
+}
+
+loki.source.journal "system" {
+  path          = "/var/log/journal"
+  max_age       = "12h"
+  relabel_rules = loki.relabel.journal.rules
+  labels        = { job = "journal" }
+  forward_to    = [loki.write.local.receiver]
+}
+
+// --- files -------------------------------------------------------------------
+local.file_match "caddy" {
+  path_targets = [{ __path__ = "/var/log/caddy/*.log", job = "caddy" }]
+}
+
+loki.source.file "caddy" {
+  targets    = local.file_match.caddy.targets
+  forward_to = [loki.write.local.receiver]
+}
+
+local.file_match "security" {
+  path_targets = [{ __path__ = "/srv/central/storage/logs/security-*.log", job = "central-security" }]
+}
+
+loki.source.file "security" {
+  targets    = local.file_match.security.targets
+  forward_to = [loki.write.local.receiver]
+}
+
+local.file_match "auditd" {
+  path_targets = [{ __path__ = "/var/log/audit/audit.log", job = "auditd" }]
+}
+
+loki.source.file "auditd" {
+  targets    = local.file_match.auditd.targets
+  forward_to = [loki.write.local.receiver]
+}
+
+// The application log: a record starts with "[YYYY-MM-DD HH:MM:SS]"; stack traces follow it.
+local.file_match "laravel" {
+  path_targets = [{ __path__ = "/srv/central/storage/logs/laravel*.log", job = "laravel" }]
+}
+
+loki.process "laravel" {
+  stage.multiline {
+    firstline     = "^\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\]"
+    max_wait_time = "3s"
+  }
+  stage.regex {
+    expression = "^\\[[^\\]]+\\] \\w+\\.(?P<level>[A-Z]+):"
+  }
+  stage.labels {
+    values = { level = "" }
+  }
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.source.file "laravel" {
+  targets    = local.file_match.laravel.targets
+  forward_to = [loki.process.laravel.receiver]
+}

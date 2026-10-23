@@ -108,6 +108,59 @@ class DeployKitTest extends TestCase
         $this->assertStringContainsString('/srv/central/storage/logs/security-*.log', $acquis);
     }
 
+    public function test_the_monitoring_stack_stays_on_loopback_and_root_runs_only_its_own_copies(): void
+    {
+        $dir = $this->root.'/deploy/monitoring';
+        foreach (['install.sh', 'ship-logs.sh', 'textfile/collect.sh'] as $script) {
+            $process = new Process(['bash', '-n', "{$dir}/{$script}"]);
+            $process->run();
+            $this->assertTrue($process->isSuccessful(), $script.': '.$process->getErrorOutput());
+        }
+
+        $compose = (string) file_get_contents("{$dir}/docker-compose.yml");
+        $this->assertStringNotContainsString("\n    ports:", $compose, 'a published port bypasses ufw');
+        $this->assertStringContainsString('network_mode: host', $compose);
+        foreach (['grafana:', 'loki:', 'prometheus:', 'alloy:', 'node_exporter:', 'postgres_exporter:', 'redis_exporter:'] as $service) {
+            $this->assertStringContainsString("\n  {$service}", $compose);
+        }
+        foreach (['GF_SERVER_HTTP_ADDR: 127.0.0.1', '--web.listen-address=127.0.0.1:9090', '--server.http.listen-addr=127.0.0.1:12345', '--web.listen-address=127.0.0.1:9100', '--web.listen-address=127.0.0.1:9187', '--web.listen-address=127.0.0.1:9121'] as $needle) {
+            $this->assertStringContainsString($needle, $compose, 'every service listens on loopback');
+        }
+        $this->assertStringContainsString('GF_ANALYTICS_REPORTING_ENABLED: "false"', $compose, 'nothing phones home');
+        $this->assertStringContainsString('--disable-reporting', $compose);
+        $this->assertStringContainsString('reporting_enabled: false', (string) file_get_contents("{$dir}/loki/loki.yml"));
+        preg_match_all('/image: (\S+)/', $compose, $images);
+        $this->assertCount(7, $images[1]);
+        foreach ($images[1] as $image) {
+            $this->assertMatchesRegularExpression('/:v?\d+\.\d+\.\d+$/', $image, "{$image} is pinned to a version");
+        }
+
+        $env = (string) file_get_contents("{$dir}/.env.example");
+        foreach (['DOMAIN=', 'GF_SECURITY_ADMIN_PASSWORD=', 'GF_SMTP_HOST=', 'ALERT_EMAIL=', 'MONITOR_DB_PASSWORD=', 'REDIS_QUEUE_KEY=', 'LOGS_RCLONE_REMOTE='] as $key) {
+            $this->assertStringContainsString($key, $env);
+        }
+        $this->assertFileDoesNotExist("{$dir}/.env", 'the real values are never committed');
+
+        $install = (string) file_get_contents("{$dir}/install.sh");
+        $this->assertStringContainsString('/usr/local/sbin/central-collect', $install, "root's cron never runs a file the central user can edit");
+        $this->assertStringContainsString('/usr/local/sbin/central-ship-logs', $install);
+        $this->assertStringContainsString('GRANT SELECT ON failed_jobs, backup_runs TO monitor', $install);
+        $this->assertStringContainsString('change-me', $install, 'the example passwords are refused');
+
+        $alloy = (string) file_get_contents("{$dir}/alloy/config.alloy");
+        foreach (['job = "caddy"', 'job = "central-security"', 'job = "auditd"', 'job = "laravel"', 'job = "journal"'] as $label) {
+            $this->assertStringContainsString($label, $alloy);
+        }
+        $rules = (string) file_get_contents("{$dir}/grafana/provisioning/alerting/rules.yaml");
+        $this->assertSame(14, preg_match_all('/^      - uid: central-/m', $rules), 'the fourteen rules of the runbook');
+        $this->assertStringContainsString('central_unexpected_listening_port', (string) file_get_contents("{$dir}/textfile/collect.sh"));
+        $this->assertStringContainsString('central_tls_cert_expiry_seconds', (string) file_get_contents("{$dir}/textfile/collect.sh"));
+
+        $tests = (string) file_get_contents($this->root.'/.github/workflows/laravel.yml');
+        $this->assertStringContainsString('docker compose -f deploy/monitoring/docker-compose.yml', $tests);
+        $this->assertStringContainsString('deploy/monitoring/*.sh', $tests);
+    }
+
     public function test_the_deploy_workflow_runs_the_suite_first_and_only_from_the_production_branch(): void
     {
         $deploy = (string) file_get_contents($this->root.'/.github/workflows/deploy.yml');

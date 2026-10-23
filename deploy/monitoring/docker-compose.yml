@@ -10,7 +10,11 @@ name: central-monitoring
 x-common: &common
   network_mode: host
   restart: unless-stopped
-  env_file: .env
+  # install.sh refuses to run without the file; optional here so `docker compose config`
+  # can check this file from a checkout that has none.
+  env_file:
+    - path: .env
+      required: false
   logging:
     driver: json-file
     options: { max-size: "10m", max-file: "3" }

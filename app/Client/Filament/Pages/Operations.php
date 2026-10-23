@@ -10,21 +10,26 @@ use App\Client\Domain\Ops\Health\OpsCheck;
 use App\Client\Domain\Ops\Health\OpsHealth;
 use App\Client\Domain\Ops\Integrity\IntegrityFinding;
 use App\Client\Domain\Ops\Integrity\LedgerIntegrity;
+use App\Client\Domain\Ops\Security\SecurityFinding;
+use App\Client\Domain\Ops\Security\SecurityWatch;
 use App\Client\Jobs\RunBackup;
 use App\Client\Models\BackupRun;
 use App\Client\Screens\CentralScreen;
 use App\Filament\Support\ErpPage;
+use App\Models\Company\AuditLog;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Operations: how the box stands right now. The seven health checks, the
- * backups (state and the last runs), the ledger integrity findings and
- * whether an alert is throttled. A backup can be asked for from here; it
- * runs on the worker. Administrator only.
+ * backups (state and the last runs), the ledger integrity findings, the
+ * last day of the security watch and whether an alert is throttled. A
+ * backup can be asked for from here; it runs on the worker. Administrator
+ * only.
  */
 class Operations extends ErpPage
 {
@@ -67,6 +72,26 @@ class Operations extends ErpPage
         } catch (\Throwable) {
             return false;
         }
+    }
+
+    /** The security watch over the last day, read now. @return list<SecurityFinding> */
+    public function securityFindings(): array
+    {
+        return app(SecurityWatch::class)->findings(now()->subDay());
+    }
+
+    /** Failed sign-ins in the last day, per guard. @return array<string, int> */
+    public function failedLogins(): array
+    {
+        return AuditLog::query()->where('action', 'login_failed')->where('created_at', '>=', now()->subDay())
+            ->select(DB::raw("coalesce(meta->>'guard', '?') as guard"), DB::raw('count(*) as n'))
+            ->groupBy(DB::raw("coalesce(meta->>'guard', '?')"))->pluck('n', 'guard')->map(fn ($n) => (int) $n)->all();
+    }
+
+    /** The last staff sign-ins, newest first. @return Collection<int, AuditLog> */
+    public function recentLogins(): Collection
+    {
+        return AuditLog::query()->with('user')->where('action', 'login_succeeded')->where('document_type', 'user')->latest('id')->limit(10)->get();
     }
 
     protected function getHeaderActions(): array

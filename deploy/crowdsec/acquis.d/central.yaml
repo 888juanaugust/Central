@@ -1,0 +1,20 @@
+# What CrowdSec reads on Central's server (deploy/harden.sh installs this to
+# /etc/crowdsec/acquis.d/). Three sources: sshd from the journal (Ubuntu 24.04
+# minimal has no /var/log/auth.log), Caddy's JSON access log, and the
+# security log Central writes on every failed or successful panel login.
+---
+source: journalctl
+journalctl_filter:
+  - "_SYSTEMD_UNIT=ssh.service"
+labels:
+  type: syslog
+---
+filenames:
+  - /var/log/caddy/*.log
+labels:
+  type: caddy
+---
+filenames:
+  - /srv/central/storage/logs/security-*.log
+labels:
+  type: central-security

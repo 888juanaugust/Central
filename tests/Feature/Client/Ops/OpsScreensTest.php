@@ -8,6 +8,7 @@ use App\Client\Domain\Ops\Health\OpsHealth;
 use App\Client\Filament\Pages\Operations;
 use App\Client\Jobs\RunBackup;
 use App\Client\Models\BackupRun;
+use App\Models\Company\AuditLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -33,12 +34,18 @@ class OpsScreensTest extends TestCase
         BackupRun::query()->create(['started_at' => now()->subDay(), 'status' => BackupRun::FAILED, 'disk' => 's3', 'offsite' => true, 'error' => 'pg_dump failed: boom']);
         $this->stock($this->gudangJakarta, 5);
         DB::table('item_costs')->where('item_id', $this->item->id)->update(['qty_on_hand' => 999]);
+        AuditLog::query()->create(['action' => 'login_succeeded', 'user_id' => $this->owner->id, 'document_type' => 'user', 'document_id' => $this->owner->id, 'ip' => '198.51.100.44', 'meta' => ['guard' => 'web'], 'created_at' => now()->subMinutes(3)]);
+        foreach (range(1, 3) as $i) {
+            AuditLog::query()->create(['action' => 'login_failed', 'reference' => 'buyer@example.test', 'ip' => '203.0.113.5', 'meta' => ['guard' => 'customer'], 'created_at' => now()->subMinutes($i)]);
+        }
+        AuditLog::query()->create(['action' => 'preference_changed', 'meta' => ['key' => 'rules.segregation_of_duties', 'old' => true, 'new' => false], 'created_at' => now()->subMinutes(2)]);
         Queue::fake();
 
         Livewire::test(Operations::class)->assertOk()
             ->assertSee('Scheduler')->assertSee('Last heartbeat')->assertSee('stored off this machine')
             ->assertSee('Verified')->assertSee('Failed')->assertSee('pg_dump failed: boom')->assertSee('2 KiB')
             ->assertSee('[stock]')->assertSee('cache 999.0000')
+            ->assertSee('Security watch')->assertSee('Segregation of duties switched off')->assertSee('198.51.100.44')->assertSee($this->owner->name)->assertSeeInOrder(['Portal', '3'])
             ->callAction('backup')->assertNotified('Backup queued');
         Queue::assertPushed(RunBackup::class);
     }

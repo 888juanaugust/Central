@@ -100,7 +100,8 @@ fi
 
 # --- caddy, logrotate, supervisor from the kit's own files -------------------
 say "Caddyfile ($DOMAIN)"
-sed "s/__DOMAIN__/$DOMAIN/" "$REPO_DIR/deploy/Caddyfile" > /etc/caddy/Caddyfile
+# The monitor site needs a password hash; harden.sh writes it, this leaves the block out.
+sed -e "s/__DOMAIN__/$DOMAIN/g" -e '/^# monitor-begin$/,/^# monitor-end$/d' "$REPO_DIR/deploy/Caddyfile" > /etc/caddy/Caddyfile
 mkdir -p /var/log/caddy && chown caddy:caddy /var/log/caddy
 systemctl enable --now caddy >/dev/null
 systemctl reload caddy || true
@@ -124,4 +125,5 @@ cat <<'NEXT'
   3. Fill .env: the database password, APP_URL, MAIL_*, BACKUP_* and the bucket's AWS_* keys.
   4. php artisan erp:install ... (section 3), then point the domain here and  systemctl reload caddy
   5. php artisan central:launch-check, and keep going until it exits 0.
+  6. sudo bash deploy/harden.sh <domain>  (keys-only SSH, patches, auditd, CrowdSec; docs/BLUE-TEAM.md)
 NEXT

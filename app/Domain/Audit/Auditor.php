@@ -28,11 +28,14 @@ final class Auditor
         ?string $reference = null,
         array $meta = [],
         ?string $transDate = null,
+        ?int $userId = null,
     ): AuditLog {
         $request = app()->runningInConsole() ? null : request();
 
         return AuditLog::query()->create([
-            'user_id' => auth()->id(),
+            // The actor is whoever is signed in, unless the caller knows better: a login
+            // listener runs before the guard has set its user (Central's security watch).
+            'user_id' => $userId ?? auth()->id(),
             'action' => $action,
             'document_type' => $subject?->getMorphClass(),
             'document_id' => $subject?->getKey(),

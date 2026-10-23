@@ -1,0 +1,263 @@
+# The alert rules of Central's box, one group evaluated every minute. Each
+# rule is a query (A) and a threshold on it (C). Thresholds are the ones in
+# docs/BLUE-TEAM.md; change them here and in that table together.
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: central-box
+    folder: Central
+    interval: 1m
+    rules:
+      # ----- who is on the box ------------------------------------------------
+      - uid: central-ssh-login
+        title: SSH login accepted
+        condition: C
+        for: 0s
+        labels: { severity: notice }
+        annotations:
+          summary: Somebody opened an SSH session on the server. Expected only when you did.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: 'sum(count_over_time({job="journal", unit="ssh.service"} |= "Accepted publickey" [5m]))'
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [0] } }] }
+
+      - uid: central-sudo
+        title: sudo used
+        condition: C
+        for: 0s
+        labels: { severity: notice }
+        annotations:
+          summary: A command ran as root through sudo. Expected only during your own maintenance.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: 'sum(count_over_time({job="journal", identifier="sudo"} |= "COMMAND=" [5m]))'
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [0] } }] }
+
+      - uid: central-auditd
+        title: An access-deciding file changed
+        condition: C
+        for: 0s
+        labels: { severity: critical }
+        annotations:
+          summary: auditd saw a write to .env, sshd, sudoers or the identity files. Check `ausearch -k <key>`.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: 'sum(count_over_time({job="auditd"} |~ `key="(identity|sudoers|sshd|central-env)"` [5m]))'
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [0] } }] }
+
+      - uid: central-new-port
+        title: A port is listening that is not on the allowlist
+        condition: C
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: Something started listening that the baseline does not know. `ss -tlnp` names the process.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model: { refId: A, instant: true, expr: 'sum(central_unexpected_listening_port)' }
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [0] } }] }
+
+      # ----- attacks -----------------------------------------------------------
+      - uid: central-crowdsec-bans
+        title: CrowdSec ban spike
+        condition: C
+        for: 0s
+        labels: { severity: warning }
+        annotations:
+          summary: More than five addresses banned in fifteen minutes. `cscli decisions list` shows them.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 900, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: 'sum(count_over_time({job="journal", unit="crowdsec.service"} |= "performed" [15m]))'
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [5] } }] }
+
+      - uid: central-failed-logins
+        title: Failed panel logins
+        condition: C
+        for: 0s
+        labels: { severity: warning }
+        annotations:
+          summary: More than twenty failed sign-ins on the panel or the portal in fifteen minutes. The Operations screen names the addresses.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 900, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: 'sum(count_over_time({job="central-security"} | json | context_event = "login_failed" [15m]))'
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [20] } }] }
+
+      - uid: central-5xx
+        title: Server errors
+        condition: C
+        for: 0s
+        labels: { severity: warning }
+        annotations:
+          summary: More than twenty 5xx responses in five minutes. storage/logs/laravel-*.log has the exception.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: loki
+            model:
+              refId: A
+              queryType: instant
+              expr: 'sum(count_over_time({job="caddy"} | json | status >= 500 [5m]))'
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [20] } }] }
+
+      - uid: central-cpu
+        title: CPU busy for half an hour
+        condition: C
+        for: 30m
+        labels: { severity: warning }
+        annotations:
+          summary: Above 90 % for thirty minutes. A build is short; a miner is not. `top` names the process.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model: { refId: A, instant: true, expr: '1 - avg(rate(node_cpu_seconds_total{mode="idle"}[10m]))' }
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [0.9] } }] }
+
+      - uid: central-outbound
+        title: Outbound traffic spike
+        condition: C
+        for: 10m
+        labels: { severity: critical }
+        annotations:
+          summary: More than 20 MB/s leaving the box for ten minutes. A backup upload is expected at 02:15; anything else is not.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model: { refId: A, instant: true, expr: 'sum(rate(node_network_transmit_bytes_total{device!~"lo|docker.*|veth.*|br-.*"}[5m]))' }
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [20000000] } }] }
+
+      # ----- the box itself ----------------------------------------------------
+      - uid: central-disk
+        title: Disk above 80 %
+        condition: C
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: The root filesystem is above 80 %. Tonight's dump needs room; `journalctl --vacuum-size=100M`, old releases, docker image prune.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model: { refId: A, instant: true, expr: '1 - node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}' }
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [0.8] } }] }
+
+      - uid: central-tls
+        title: Certificate expires within two weeks
+        condition: C
+        for: 1h
+        labels: { severity: critical }
+        annotations:
+          summary: Caddy renews on its own; this fires only when renewal has been failing. `journalctl -u caddy` says why.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model: { refId: A, instant: true, expr: 'min(central_tls_cert_expiry_seconds)' }
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: lt, params: [1209600] } }] }
+
+      - uid: central-queue
+        title: Queue backed up
+        condition: C
+        for: 10m
+        labels: { severity: critical }
+        annotations:
+          summary: More than 200 jobs waiting for ten minutes. The worker is dead or stuck; `supervisorctl status`.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model: { refId: A, instant: true, expr: 'max(redis_key_size)' }
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [200] } }] }
+
+      - uid: central-failed-jobs
+        title: Failed jobs
+        condition: C
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: A queued job failed. `php artisan queue:failed`, then retry or forget it.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              rawSql: 'SELECT count(*)::float AS failed FROM failed_jobs'
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [0] } }] }
+
+      - uid: central-backup
+        title: No verified off-site backup in 26 hours
+        condition: C
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: The nightly backup did not finish and verify. The Operations screen shows the failing step.
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: postgres
+            model:
+              refId: A
+              format: table
+              rawQuery: true
+              rawSql: "SELECT coalesce(extract(epoch FROM now() - max(started_at)) / 3600, 9999)::float AS hours FROM backup_runs WHERE status = 'verified' AND offsite"
+          - refId: C
+            datasourceUid: __expr__
+            model: { refId: C, type: threshold, expression: A, conditions: [{ evaluator: { type: gt, params: [26] } }] }

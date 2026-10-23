@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Client;
 
 use App\Client\Domain\Debt\AcceptanceAging;
+use App\Client\Domain\Ops\Alerts\NullSender;
+use App\Client\Domain\Ops\Alerts\WhatsAppSender;
 use App\Client\Domain\Ops\Backup\BackupCipher;
 use App\Client\Domain\Ops\Backup\DatabaseDumper;
 use App\Client\Domain\Ops\Backup\FileArchiver;
 use App\Client\Domain\Ops\Launch\LaunchReadiness;
+use App\Client\Domain\Ops\Security\RecordsAuthEvents;
 use App\Client\Domain\Pricing\CentralPrices;
 use App\Client\Domain\Stock\Reservations;
 use App\Client\Portal\PortalPanelProvider;
@@ -17,8 +20,10 @@ use App\Client\Site\Http\SiteLocale;
 use App\Client\Site\SiteSettings;
 use App\Domain\Sales\Contracts\AgingDate;
 use App\Domain\Sales\Contracts\Prices;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Monolog\Formatter\JsonFormatter;
 
 /**
  * Central's own code lives under app/Client and boots from here, last of
@@ -60,11 +65,30 @@ class ClientServiceProvider extends ServiceProvider
         $this->app->bind(FileArchiver::class, fn () => FileArchiver::fromConfig());
         // Every selling line is priced by Central's rules: customer deals, the tier, the list in force.
         $this->app->bind(Prices::class, CentralPrices::class);
+        // WhatsApp alerts: the sender for the configured provider, none until one is chosen (sub-project 11).
+        $this->app->bind(WhatsAppSender::class, fn () => match (trim((string) config('ops.whatsapp.provider'))) {
+            default => new NullSender,
+        });
+        // The security log: one JSON line per sign-in event, read by CrowdSec and shipped off the box.
+        // Defined here rather than in config/logging.php, which stays the base's.
+        if (! config()->has('logging.channels.'.RecordsAuthEvents::CHANNEL)) {
+            config()->set('logging.channels.'.RecordsAuthEvents::CHANNEL, [
+                'driver' => 'daily',
+                'path' => storage_path('logs/security.log'),
+                'level' => 'info',
+                'days' => 30,
+                'formatter' => JsonFormatter::class,
+                'replace_placeholders' => true,
+            ]);
+        }
         $this->app->bind(AgingDate::class, AcceptanceAging::class); // an invoice ages from its order's approval
     }
 
     public function boot(): void
     {
+        // Every sign-in attempt on either guard is audited and logged for the security watch.
+        Event::subscribe(RecordsAuthEvents::class);
+
         // The public site (sub-project 5). Registered once the application has
         // booted, after the base's routes/web.php, so the site's "/" replaces
         // the base's redirect to the panel: for one method and URI the route

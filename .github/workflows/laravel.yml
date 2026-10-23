@@ -90,4 +90,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm audit --audit-level=moderate
-      - run: for f in .claude/hooks/session-start.sh deploy/provision.sh deploy/deploy.sh; do bash -n "$f"; done
+      - run: for f in .claude/hooks/session-start.sh deploy/provision.sh deploy/deploy.sh deploy/harden.sh deploy/monitoring/install.sh deploy/monitoring/ship-logs.sh deploy/monitoring/textfile/collect.sh; do bash -n "$f"; done
+      - run: shellcheck --severity=warning deploy/*.sh deploy/monitoring/*.sh deploy/monitoring/textfile/*.sh
+      - run: docker compose -f deploy/monitoring/docker-compose.yml --env-file deploy/monitoring/.env.example config -q

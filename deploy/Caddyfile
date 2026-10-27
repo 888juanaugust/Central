@@ -3,6 +3,8 @@
 # application sends its own security headers (content policy, frame and
 # content-type rules, referrer policy, HSTS over HTTPS), so none are added
 # here and none may conflict.
+#
+# The log is group-readable so the log shipper and CrowdSec can read it.
 __DOMAIN__ {
     root * /srv/central/public
     encode zstd gzip
@@ -12,6 +14,26 @@ __DOMAIN__ {
         max_size 32MB
     }
     log {
-        output file /var/log/caddy/central.log
+        output file /var/log/caddy/central.log {
+            mode 0640
+        }
     }
 }
+
+# monitor-begin
+# Grafana (deploy/monitoring), bound to loopback and reached only through
+# here: Caddy's own password first, then Grafana's login. harden.sh fills
+# the two placeholders from `caddy hash-password`; provision.sh drops the
+# whole block when they are not set.
+monitor.__DOMAIN__ {
+    basic_auth {
+        __MONITOR_USER__ __MONITOR_HASH__
+    }
+    reverse_proxy 127.0.0.1:3000
+    log {
+        output file /var/log/caddy/monitor.log {
+            mode 0640
+        }
+    }
+}
+# monitor-end

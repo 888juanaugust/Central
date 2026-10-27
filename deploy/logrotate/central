@@ -1,6 +1,6 @@
-# The worker's and Caddy's logs. The application log rotates itself
-# (LOG_CHANNEL=daily keeps 14 days).
-/srv/central/storage/logs/worker.log /var/log/caddy/central.log {
+# The worker's and Caddy's logs. The application log and the security log
+# rotate themselves (LOG_CHANNEL=daily keeps 14 days, security.log 30).
+/srv/central/storage/logs/worker.log /var/log/caddy/central.log /var/log/caddy/monitor.log {
     weekly
     rotate 8
     compress

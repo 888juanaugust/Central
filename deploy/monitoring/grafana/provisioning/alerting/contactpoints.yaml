@@ -1,0 +1,16 @@
+# Grafana reaches one address by mail (ALERT_EMAIL in .env). Central itself
+# sends the WhatsApp copy of its own alerts; once a provider is chosen a
+# webhook contact point can post Grafana's to it directly, never through
+# Central (docs/BLUE-TEAM.md).
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: owner-mail
+    receivers:
+      - uid: owner-mail
+        type: email
+        settings:
+          addresses: ${ALERT_EMAIL}
+          singleEmail: true
+        disableResolveMessage: false

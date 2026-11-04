@@ -1,0 +1,21 @@
+# Ten failed panel or portal logins from one address within about ten minutes:
+# the address is banned at the firewall for the profile's default (four hours).
+# Filament already refuses more than five attempts a minute per address; this
+# catches the slow guesser that stays under that limit.
+type: leaky
+name: central/login-bf
+description: "Brute force on Central's panel or portal login"
+filter: "evt.Meta.log_type == 'central_login_failed'"
+groupby: evt.Meta.source_ip
+capacity: 10
+leakspeed: "60s"
+blackhole: 5m
+labels:
+  service: central
+  confidence: 3
+  spoofable: 0
+  classification:
+    - attack.T1110
+  behavior: "http:bruteforce"
+  label: "Central login brute force"
+  remediation: true

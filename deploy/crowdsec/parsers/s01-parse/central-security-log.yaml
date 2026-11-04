@@ -1,0 +1,25 @@
+# Parses Central's security log: one JSON line per auth event, written by
+# App\Client\Domain\Ops\Security\RecordsAuthEvents through the "security"
+# log channel. Only failed logins reach a scenario; the rest is dropped here.
+onsuccess: next_stage
+filter: "evt.Parsed.program == 'central-security'"
+name: central/security-log
+description: "Central's panel and portal login failures"
+nodes:
+  - filter: "UnmarshalJSON(evt.Parsed.message, evt.Unmarshaled, 'central') in ['', nil] && evt.Unmarshaled.central.context.event == 'login_failed'"
+    statics:
+      - meta: log_type
+        value: central_login_failed
+      - meta: service
+        value: central
+      - meta: source_ip
+        expression: evt.Unmarshaled.central.context.ip
+      - meta: guard
+        expression: evt.Unmarshaled.central.context.guard
+      - meta: target_user
+        expression: evt.Unmarshaled.central.context.email
+      - target: evt.StrTime
+        expression: evt.Unmarshaled.central.datetime
+statics:
+  - meta: service
+    value: central

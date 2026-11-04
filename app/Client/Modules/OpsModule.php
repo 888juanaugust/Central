@@ -10,6 +10,7 @@ use App\Client\Console\HealthCommand;
 use App\Client\Console\IntegrityCommand;
 use App\Client\Console\LaunchCheckCommand;
 use App\Client\Console\RestoreCommand;
+use App\Client\Console\SecurityWatchCommand;
 use App\Client\Domain\Ops\Health\OpsHealth;
 use App\Client\Models\BackupRun;
 use App\Client\Models\LaunchAttestation;
@@ -19,8 +20,8 @@ use Illuminate\Console\Scheduling\Schedule;
 
 /**
  * Operations: encrypted, verified backups and their restore; the health
- * checks and the critical alert; the ledger integrity sweep; launch
- * readiness. Always on.
+ * checks and the critical alert; the ledger integrity sweep; the security
+ * watch over the Activity Log; launch readiness. Always on.
  */
 final class OpsModule extends BaseModule
 {
@@ -41,7 +42,7 @@ final class OpsModule extends BaseModule
 
     public static function commands(): array
     {
-        return [BackupCommand::class, BackupKeyCommand::class, RestoreCommand::class, HealthCommand::class, IntegrityCommand::class, LaunchCheckCommand::class];
+        return [BackupCommand::class, BackupKeyCommand::class, RestoreCommand::class, HealthCommand::class, IntegrityCommand::class, SecurityWatchCommand::class, LaunchCheckCommand::class];
     }
 
     public static function schedule(Schedule $schedule): void
@@ -49,6 +50,8 @@ final class OpsModule extends BaseModule
         // The heartbeat the scheduler check reads: a minute without it means cron is not running.
         $schedule->call(fn () => OpsHealth::beat())->everyMinute()->name('ops-heartbeat')->withoutOverlapping()->onOneServer();
         $schedule->command('central:health --alert')->hourly()->withoutOverlapping()->onOneServer();
+        // A twenty-minute window read every ten minutes: the overlap is absorbed by the per-finding throttle.
+        $schedule->command('central:security-watch --alert')->everyTenMinutes()->withoutOverlapping()->onOneServer();
         // The sweep before the backup, so the night's backup holds books already checked.
         $schedule->command('central:integrity --notify')->dailyAt('01:30')->withoutOverlapping(60)->onOneServer();
         // Not runInBackground(): the exit code of a failed backup must reach the scheduler.

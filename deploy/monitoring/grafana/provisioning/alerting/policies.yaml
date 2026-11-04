@@ -1,0 +1,16 @@
+# Everything goes to the owner's mail; critical rules repeat every four
+# hours while they stand, the rest once a day.
+apiVersion: 1
+
+policies:
+  - orgId: 1
+    receiver: owner-mail
+    group_by: ["alertname"]
+    group_wait: 1m
+    group_interval: 5m
+    repeat_interval: 24h
+    routes:
+      - receiver: owner-mail
+        object_matchers:
+          - ["severity", "=", "critical"]
+        repeat_interval: 4h

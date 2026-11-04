@@ -1,0 +1,5 @@
+// Central: check and apply security updates daily (deploy/harden.sh).
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";

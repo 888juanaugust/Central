@@ -13,9 +13,11 @@ user, the firewall (SSH, 80, 443; PostgreSQL and Redis listen on `127.0.0.1` onl
 8.4 with `pdo_pgsql intl bcmath mbstring gd zip curl redis` and PHP-FPM, PostgreSQL 16,
 Redis 7 (`maxmemory 512mb`, `noeviction`: the queue fails loudly rather than losing
 jobs), Caddy 2, supervisor, the cron line, Node 22 for the asset build only. It is
-idempotent and stops before what it cannot decide: the database password, `.env`, SSH
-hardening (`PermitRootLogin no`, `PasswordAuthentication no` in `sshd_config`, once a
-session as `central` is proven to work).
+idempotent and stops before what it cannot decide: the database password, `.env`, and
+the hardening. Once a session as `central` is proven to work, and **with that session
+kept open**, `sudo bash deploy/harden.sh erp.example.co.id` locks root and passwords out
+of SSH, turns on security updates, auditd and CrowdSec, and installs Docker for the
+monitoring stack; section 10 and [BLUE-TEAM.md](BLUE-TEAM.md) say the rest.
 
 ## 2. The `.env`
 
@@ -37,6 +39,7 @@ Start from `.env.example`. In production:
 | `BACKUP_ENCRYPTION_KEY` | from `php artisan central:backup-key` | kept off the server too |
 | `AWS_*` | the bucket's keys; `AWS_ENDPOINT` for R2 or B2 | |
 | `OPS_ALERT_EMAIL` | an address besides the administrators, optional | |
+| `WHATSAPP_PROVIDER`, `WHATSAPP_TOKEN`, `WHATSAPP_ALERT_TO` | empty until a provider is chosen | the WhatsApp copy of the health and security alerts |
 
 **The application key encrypts personal data** (national IDs, tax IDs and bank account
 numbers; see [PRIVACY.md](PRIVACY.md)) and the two-factor secrets. Keep a copy outside
@@ -84,7 +87,8 @@ schedule, each entry once at a time and on one server (Redis holds the lock):
 | When | What |
 |---|---|
 | every minute | the scheduler's heartbeat (the health check reads it) |
-| hourly | `central:health --alert`: a mail per critical incident, re-armed on recovery |
+| hourly | `central:health --alert`: an alert per critical incident, re-armed on recovery |
+| every 10 minutes | `central:security-watch --alert`: the Activity Log read for guessed passwords, a new address, rights moved, the segregation switch, the price brake, a changed receipt |
 | 00:30 | `central:debt-notices` |
 | 01:00 | `central:prune-carts` |
 | 01:30 | `central:integrity --notify`: the books against their caches, mailed while a drift stands |
@@ -152,9 +156,11 @@ maintenance page only when the code on disk can still serve.
 
 ## 9. When something is wrong
 
-The Operations screen (Settings) shows the health checks, the backups and the integrity
-findings; `php artisan central:health` is the same on the command line, exit 0, 1 or 2.
-The hourly sweep mails every active administrator once per critical incident.
+The Operations screen (Settings) shows the health checks, the backups, the integrity
+findings and the last day of the security watch; `php artisan central:health` is the same
+on the command line, exit 0, 1 or 2. The hourly sweep mails every active administrator
+once per critical incident. An intrusion, or the suspicion of one, is
+[BLUE-TEAM.md](BLUE-TEAM.md), section 6, not this list.
 
 - **Redis down.** Sessions and the cache fail, the queue takes nothing, the alert cannot be
   throttled and so is sent anyway. `systemctl restart redis-server`; the workers reconnect.
@@ -177,3 +183,25 @@ The hourly sweep mails every active administrator once per critical incident.
   killed halfway: `rm -f bootstrap/cache/config.php` and run `php artisan optimize` again.
 - **A stack trace on a public page.** `APP_ENV` or `APP_DEBUG` is wrong; fix `.env` and
   `php artisan config:cache`.
+- **Locked out by CrowdSec** (SSH or the site refuses your address after a few wrong
+  passwords). From another address or the Hostinger console:
+  `sudo cscli decisions delete --ip <your address>`; then put the address in
+  `ADMIN_IP` and run `harden.sh` again so it is whitelisted.
+- **Locked out of SSH after `harden.sh`.** Your key is not in
+  `/home/central/.ssh/authorized_keys`, or you connected as root. The Hostinger console
+  still works; `sudo mv /root/sshd-backup/50-cloud-init.conf /etc/ssh/sshd_config.d/`
+  and `systemctl restart ssh` brings passwords back while you fix the key.
+- **Grafana unreachable.** `docker compose -f deploy/monitoring/docker-compose.yml ps`
+  (all seven up), `curl -u <monitor-user> https://monitor.<domain>/api/health`, and the
+  Caddy log `/var/log/caddy/monitor.log`. Grafana listens on `127.0.0.1:3000` only; it is
+  reached through Caddy or not at all.
+
+## 10. Hardening and monitoring
+
+`deploy/harden.sh` and `deploy/monitoring/` are the defence of the box: keys-only SSH,
+automatic security updates, auditd on the files that decide access, CrowdSec banning
+password guessers at the firewall (from the sshd journal, Caddy's log and Central's own
+security log), and Grafana, Loki, Prometheus and Alloy on the same server, on loopback,
+reached through Caddy at `monitor.<domain>`. What is watched, where the alerts go, the
+monthly and quarterly checklists and the incident procedure are in
+[BLUE-TEAM.md](BLUE-TEAM.md); the apply order is its section 3.

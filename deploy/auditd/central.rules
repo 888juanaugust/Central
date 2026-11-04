@@ -1,0 +1,33 @@
+## Central's audit rules (deploy/harden.sh installs this to /etc/audit/rules.d/).
+## Every line below is "someone touched a file that decides who may do what".
+## The matching Grafana rule alerts on the keys identity, sudoers, sshd and
+## central-env; the rest is kept for the investigation after an alert.
+-D
+-b 8192
+-f 1
+
+## The application's secrets: read, written or re-permissioned
+-w /srv/central/.env -p rwa -k central-env
+
+## The way in
+-w /etc/ssh -p wa -k sshd
+-w /etc/caddy -p wa -k caddy
+
+## Who may become root
+-w /etc/sudoers -p wa -k sudoers
+-w /etc/sudoers.d -p wa -k sudoers
+
+## Who exists
+-w /etc/passwd -p wa -k identity
+-w /etc/group -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+
+## The defences themselves
+-w /etc/crowdsec -p wa -k crowdsec
+-w /etc/docker -p wa -k docker
+-w /etc/audit -p wa -k auditd
+-w /srv/central/deploy -p wa -k deploy-kit
+
+## Enabled, not locked: -e 2 would need a reboot to change a rule
+-e 1

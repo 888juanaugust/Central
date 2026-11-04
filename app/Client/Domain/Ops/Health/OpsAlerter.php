@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace App\Client\Domain\Ops\Health;
 
-use App\Client\Mail\SystemAlertMessage;
-use App\Domain\Shared\Locales;
+use App\Client\Domain\Ops\Alerts\Alert;
+use App\Client\Domain\Ops\Alerts\AlertDispatcher;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /**
- * The hourly sweep: when anything is critical, one mail per incident to
- * every active administrator and the extra address, throttled for the
+ * The hourly sweep: when anything is critical, one alert per incident to
+ * every configured channel (the mail to every active administrator and the
+ * extra address, WhatsApp once a provider is set), throttled for the
  * configured hours and re-armed the moment the box is no longer critical.
- * When the cache that holds the throttle is itself down, the mail goes
+ * When the cache that holds the throttle is itself down, the alert goes
  * anyway: that is the incident.
  */
 class OpsAlerter
 {
     public const THROTTLE_KEY = 'ops:alert-throttled';
 
-    public function __construct(private readonly OpsHealth $health) {}
+    public function __construct(private readonly OpsHealth $health, private readonly AlertDispatcher $dispatcher) {}
 
-    /** @return bool whether a mail went out */
+    /** @return bool whether an alert went out */
     public function sweep(): bool
     {
         if ($this->health->worst() !== OpsStatus::Critical) {
@@ -40,11 +40,8 @@ class OpsAlerter
             return false;
         }
         $failing = $this->health->failing();
-        $recipients = self::recipients();
-        if ($recipients !== []) {
-            Locales::using(Locales::companyDefault(), fn () => Mail::to($recipients)->send(new SystemAlertMessage($failing)));
-        }
-        Log::warning('System health alert sent', ['to' => $recipients, 'findings' => array_map(fn (OpsCheck $c) => "{$c->key}: {$c->finding}", $failing)]);
+        $delivered = $this->dispatcher->dispatch(Alert::health($failing));
+        Log::warning('System health alert sent', ['channels' => $delivered, 'to' => self::recipients(), 'findings' => array_map(fn (OpsCheck $c) => "{$c->key}: {$c->finding}", $failing)]);
 
         return true;
     }

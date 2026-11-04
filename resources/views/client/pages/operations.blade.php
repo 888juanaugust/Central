@@ -6,6 +6,9 @@
     $checks = $this->checks();
     $backup = $this->backupHealth();
     $findings = $this->findings();
+    $security = $this->securityFindings();
+    $failedLogins = $this->failedLogins();
+    $recentLogins = $this->recentLogins();
     $colors = ['success' => 'text-success-600 dark:text-success-400', 'warning' => 'text-warning-600 dark:text-warning-400', 'danger' => 'text-danger-600 dark:text-danger-400'];
 @endphp
 <x-filament-panels::page>
@@ -70,5 +73,58 @@
                 @endforeach
             </ul>
         @endif
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900">
+        <div class="border-b border-black/5 px-4 py-3 dark:border-white/10">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ __('Security watch') }}</h2>
+            <p class="mt-0.5 text-xs text-gray-500 dark:text-gray-400">{{ \App\Client\Domain\Ops\Alerts\WhatsAppChannel::configured() ? __('The last day of the Activity Log, read now. Every ten minutes the watch reports what is new by mail and WhatsApp.') : __('The last day of the Activity Log, read now. Every ten minutes the watch reports what is new by mail.') }}</p>
+        </div>
+        <div class="grid gap-4 p-4 lg:grid-cols-2">
+            <div>
+                <h3 class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">{{ __('Findings') }}</h3>
+                @if ($security === [])
+                    <p class="mt-1 text-sm {{ $colors['success'] }}">{{ __('Nothing to report in the last day.') }}</p>
+                @else
+                    <ul class="mt-1 divide-y divide-black/5 dark:divide-white/10">
+                        @foreach ($security as $finding)
+                            <li class="flex items-start gap-3 py-2">
+                                <span class="mt-0.5 w-20 shrink-0 text-xs font-semibold uppercase {{ $colors[$finding->severity->color()] }}">{{ $finding->severity->label() }}</span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $finding->title }}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $finding->detail }}</p>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <h3 class="mt-4 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">{{ __('Failed sign-ins, last day') }}</h3>
+                @if ($failedLogins === [])
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">{{ __('None') }}</p>
+                @else
+                    <ul class="mt-1 text-sm text-gray-900 dark:text-gray-100">
+                        @foreach ($failedLogins as $guard => $count)
+                            <li>{{ $guard === 'customer' ? __('Portal') : __('Staff panel') }}: <span class="ae-money">{{ $count }}</span></li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+            <div>
+                <h3 class="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">{{ __('Last staff sign-ins') }}</h3>
+                <table class="mt-1 w-full text-sm">
+                    <tbody class="divide-y divide-black/5 dark:divide-white/10">
+                        @forelse ($recentLogins as $login)
+                            <tr>
+                                <td class="py-1.5 pe-3 text-gray-900 dark:text-gray-100">{{ $login->user?->name ?? ($login->meta['email'] ?? '') }}</td>
+                                <td class="py-1.5 pe-3 font-mono text-xs text-gray-500 dark:text-gray-400">{{ $login->ip }}</td>
+                                <td class="py-1.5 text-end text-xs text-gray-500 dark:text-gray-400">{{ Format::dateTime($login->created_at) }}</td>
+                            </tr>
+                        @empty
+                            <tr><td class="py-1.5 text-gray-500">{{ __('No sign-in on the record yet.') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </x-filament-panels::page>

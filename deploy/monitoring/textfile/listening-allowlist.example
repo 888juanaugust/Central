@@ -1,0 +1,24 @@
+# The sockets a Central box listens on. install.sh copies this to
+# /etc/central/listening-allowlist when none exists; collect.sh reports
+# every listening socket that is not here. One "proto addr:port" per line;
+# "*" is any address. Add a line when you add a service on purpose.
+tcp *:22
+tcp *:80
+tcp *:443
+udp *:443
+tcp 127.0.0.1:5432
+tcp 127.0.0.1:6379
+tcp 127.0.0.1:3000
+tcp 127.0.0.1:3100
+tcp 127.0.0.1:9096
+tcp 127.0.0.1:9090
+tcp 127.0.0.1:9100
+tcp 127.0.0.1:9121
+tcp 127.0.0.1:9187
+tcp 127.0.0.1:12345
+tcp 127.0.0.1:8080
+tcp 127.0.0.1:2019
+tcp 127.0.0.53:53
+udp 127.0.0.53:53
+udp 127.0.0.54:53
+udp *:68

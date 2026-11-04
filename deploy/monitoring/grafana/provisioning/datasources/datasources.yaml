@@ -1,0 +1,32 @@
+# The three sources every rule and panel reads. PostgreSQL through the
+# read-only monitor role install.sh creates; its password from .env.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://127.0.0.1:9090
+    isDefault: true
+    editable: false
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://127.0.0.1:3100
+    editable: false
+  - name: PostgreSQL
+    uid: postgres
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: 127.0.0.1:5432
+    user: monitor
+    editable: false
+    jsonData:
+      database: central
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+    secureJsonData:
+      password: ${MONITOR_DB_PASSWORD}

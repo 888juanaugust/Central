@@ -54,4 +54,26 @@ return [
         'throttle_hours' => 6,
     ],
 
+    // WhatsApp alerts beside the mail. Off until a provider is named; the
+    // sender for it is bound in ClientServiceProvider (NullSender until then).
+    'whatsapp' => [
+        'provider' => env('WHATSAPP_PROVIDER'),
+        'token' => env('WHATSAPP_TOKEN'),
+        // Comma-separated E.164 numbers: +62812..., +62813...
+        'recipients' => env('WHATSAPP_ALERT_TO', ''),
+    ],
+
+    // The security watch (central:security-watch, every ten minutes): what
+    // counts as a finding in the Activity Log, and how long one is quiet after
+    // it has been reported.
+    'security' => [
+        'window_minutes' => 20,
+        'failed_logins_per_ip' => 10,
+        'failed_logins_per_account' => 5,
+        'known_ip_days' => 90,
+        // Local hours; a receipt or invoice deleted outside them is a finding.
+        'business_hours' => [7, 19],
+        'throttle_hours' => 6,
+    ],
+
 ];

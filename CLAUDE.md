@@ -1,7 +1,7 @@
 ## Project
 
 **Central** is the company system of an Indonesian B2B wholesaler of automotive spare
-parts: a registered PT with an NIB, selling on credit to bengkel, toko sparepart and
+parts: a registered CV (commanditaire vennootschap) with an NIB, selling on credit to bengkel, toko sparepart and
 distributors — never to retail consumers. Brands carried: YUHOLI, OSBORN, ASTRO, STAVO,
 STAVIX, SERVO, BDAX. Categories: HYDRAULIC PART, SUSPENSION PART, ELECTRIC PART, BEARING
 PART. Three surfaces over one set of books:

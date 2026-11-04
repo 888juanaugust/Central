@@ -153,7 +153,7 @@ return [
 
     // Legal identity and the values the two legal pages cite.
     'legal' => [
-        'entity' => env('SITE_ENTITY', 'PT'),
+        'entity' => env('SITE_ENTITY', 'CV'),
         'nib' => env('SITE_NIB'),
         'established' => env('SITE_ESTABLISHED'),
         'privacy' => [

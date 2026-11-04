@@ -155,15 +155,15 @@ class SiteRoutesTest extends TestCase
 
     public function test_customers_see_the_trading_name_and_staff_see_central(): void
     {
-        app(Preferensi::class)->set(PreferensiKey::CompanyName, 'PT Java Indo Intermechanika');
+        app(Preferensi::class)->set(PreferensiKey::CompanyName, 'CV Javaindo');
 
         $home = $this->get('/')->assertOk()
             ->assertSee('<title>Javaindo · ', false)
             ->assertSee('<meta property="og:site_name" content="Javaindo">', false)
-            ->assertSee('"legalName":"PT Java Indo Intermechanika"', false)
+            ->assertSee('"legalName":"CV Javaindo"', false)
             ->getContent();
         $this->assertStringNotContainsString('Central', $home, 'the staff system never shows on the public site');
-        $this->get('/tentang-kami')->assertOk()->assertSee('PT Java Indo Intermechanika'); // the legal name, on the about page
+        $this->get('/tentang-kami')->assertOk()->assertSee('CV Javaindo'); // the legal name, on the about page
 
         $this->get('/portal/login')->assertOk()->assertSee('Javaindo · Portal')->assertDontSee('Central');
         $this->get('/admin/login')->assertOk()->assertSee('Central')->assertDontSee('Javaindo');

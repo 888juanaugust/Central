@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Client\Site;
 
+use App\Client\Models\SiteSetting;
 use App\Client\Site\Http\SiteContentSecurityPolicy;
 use App\Client\Site\Sitemap;
 use App\Client\Site\SiteSettings;
@@ -137,7 +138,7 @@ class SiteRoutesTest extends TestCase
         $this->get('/')->assertOk()->assertSee('site-hero__whatsapp', false);
 
         app(SiteSettings::class)->forget();
-        \App\Client\Models\SiteSetting::query()->delete();
+        SiteSetting::query()->delete();
         config(['site.contact.whatsapp' => '']);
         $this->get('/tentang-kami')->assertOk()->assertDontSee('site-whatsapp', false)->assertDontSee('wa.me', false);
     }

@@ -15,11 +15,12 @@ Module group `company`. 19 screens in the standard menu.
 - Month-end process closes months in order; a closed month refuses any addition, change or deletion dated in it, on the old and the new date of an edit; reopening takes a special right and is audited.
 - The activity log is the append-only record of who did what, with the document's revisions before and after each change.
 - Currencies carry their decimals (none for the rupiah, two for the dollar) and a table of rates, each from a date: rupiah per one unit, and the Minister of Finance's weekly rate for VAT when it differs. A document takes the latest rate on or before its date. Foreign currencies are offered on documents only while Multiple currencies is on and a foreign currency is active; without one, nothing on any screen changes.
-- Website (Central) is where the Owner overrides what the public site says: contact details, the about texts, the partners, the roadmap and the values the legal pages cite, each in Bahasa Indonesia and English. A value left as written in the client config is not stored; a changed one is, and every change is audited with the value before and after. The public site reads the stored value first and the config otherwise; the two legal pages stay Indonesian whatever the visitor chose.
+- Website (Central) is where the Owner overrides what the public site says: contact details, the about texts, the partners, the roadmap, the questions and answers of the home page's FAQ and the values the legal pages cite, each in Bahasa Indonesia and English. An FAQ answer may say :credit_days and :claim_days; the site fills in the default payment term's days and the claim days of the terms of sale. A value left as written in the client config is not stored; a changed one is, and every change is audited with the value before and after. The public site reads the stored value first and the config otherwise; the two legal pages stay Indonesian whatever the visitor chose.
 - Website Images (Central) holds the pictures the public home page shows: a promo is a slide of the carousel with a title, a text and a link; a photo goes in the gallery with its caption. An image shows while active and within its dates, in its order; the file lives on the public disk under promo/.
 - The bell (Central): the staff panel shows database notifications, polled every minute; a module's reminders (the delivery watch, counts due, birthdays, the month to close) arrive there and by mail in the company's language, to the administrators, a customer's team or a role. A module may add its own kinds of event to the Calendar; they join the legend.
 - Year-end Close (Central) is a lock, not a posted closing entry. The Owner closes a fiscal year once its checklist stands: every month of the year is closed, depreciation is posted for every month an active asset was in use, the year's two semester count sheets are approved, and the ledger integrity sweep finds nothing; the screen shows each item's state and what is still open. A month inside a closed year never reopens on the Month-end Process; the Owner reopens the year first, with a reason, latest year first. Closing and reopening are audited. The balance sheet keeps computing retained earnings from the books as the base does, so no jurnal penutup is posted. Finance reads the screen.
 - The month to close (Central): when the next month to close is more than ten days past (`central:books-reminder`, every morning), Finance and the administrators get a bell and a mail pointing at the Month-end Process, once per month. The calendar marks the fiscal year's end for whoever may open the Month-end Process.
+- The public home page (Central) carries the company's mark faint behind the hero, the company at a glance (the mark, the name, the tagline and four facts read from the system: categories, brands, active branches and the default payment term's days, with the branches it ships from), what a buyer gets in the portal beside a picture of the reorder card (parts and quantities, never an amount), the FAQ, and a WhatsApp button on every page while a WhatsApp number is set. A cookie notice says once that the site sets technical cookies only; its acknowledgement stays in the browser's local storage.
 
 ## Screens
 
@@ -521,6 +522,10 @@ Menu key `client__website` · module `central-site`
 #### Tab: Roadmap
 
 **Line grid "Roadmap":** Title (Bahasa Indonesia) · Title (English) · Status · Notes (Bahasa Indonesia) · Notes (English)
+
+#### Tab: FAQ
+
+**Line grid "Questions":** Question (Bahasa Indonesia) · Question (English) · Answer (Bahasa Indonesia) · Answer (English)
 
 #### Tab: Legal
 

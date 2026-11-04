@@ -1,6 +1,6 @@
 # Landing page — the old site's missing pieces, the portal, WhatsApp and the FAQ
 
-Status: in progress.
+Status: built (2026-11-04).
 
 ## Why
 

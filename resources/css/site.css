@@ -1320,13 +1320,18 @@
     /* The mark behind the hero: the brand as the only ornament, oversized and nearly gone. */
     .site-hero__mark {
         position: absolute;
-        right: clamp(-9rem, -8vw, -3rem);
-        top: clamp(1rem, 4vw, 3rem);
+        right: 0;
+        top: clamp(1.5rem, 4vw, 3rem);
         width: auto;
-        height: clamp(20rem, 46vw, 38rem);
+        max-width: 70%;
+        height: clamp(18rem, 44vw, 34rem);
+        object-fit: contain;
+        object-position: right top;
         opacity: var(--site-mark-opacity);
         pointer-events: none;
         user-select: none;
+        /* Fades out toward the panel below, so the mark never ends on a hard edge. */
+        mask-image: linear-gradient(to bottom, #000 45%, transparent 92%);
     }
     .site-hero__whatsapp {
         position: relative;
@@ -1510,7 +1515,7 @@
     .site-portal-mock::before {
         content: '';
         position: absolute;
-        inset: 8% -6% -6% 8%;
+        inset: 8% 0 -6% 8%;
         border-radius: 32px;
         background: radial-gradient(ellipse at 70% 60%, var(--site-glow), transparent 70%);
         pointer-events: none;
@@ -1593,6 +1598,8 @@
         color: var(--ae-ink);
     }
     .site-portal-mock__meta {
+        flex: none;
+        white-space: nowrap;
         font-size: 0.75rem;
         font-variant-numeric: tabular-nums;
         color: var(--ae-muted);
@@ -1652,7 +1659,7 @@
         display: block;
         margin-top: 0.875rem;
         padding: 0.625rem;
-        border-radius: var(--ae-radius-md);
+        border-radius: var(--ae-radius-sm);
         background: var(--ae-accent-fill);
         box-shadow: var(--ae-shadow-btn);
         color: var(--ae-on-accent);
@@ -1761,7 +1768,7 @@
         transform: translateY(-2px);
     }
     .site-whatsapp:active {
-        transform: scale(0.97);
+        transform: scale(0.96);
     }
     .site-whatsapp svg {
         width: 1.5rem;
@@ -1845,6 +1852,12 @@
         align-items: center;
         justify-content: flex-end;
         gap: 1rem;
+    }
+    /* A finger needs a 44px target; the small button grows on a touch screen. */
+    @media (pointer: coarse) {
+        .site-notice .site-btn {
+            min-height: 2.75rem;
+        }
     }
     @media (prefers-reduced-motion: no-preference) {
         .site-notice {

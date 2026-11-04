@@ -70,6 +70,8 @@
         ]))->values()->all(),
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
 
+    @stack('schema')
+
     @vite(['resources/css/site.css', 'resources/js/site.js'])
 </head>
 <body class="site-body">
@@ -152,6 +154,9 @@
             <p>{{ __('Wholesale only. Prices are set per customer and never shown publicly.') }}</p>
         </div>
     </footer>
+
+    @include('client.site.partials.whatsapp', ['whatsapp' => Copy::whatsapp()])
+    @include('client.site.partials.cookie-notice')
 
 </body>
 </html>

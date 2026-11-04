@@ -82,6 +82,36 @@ return [
         ],
     ],
 
+    // Questions a buyer asks before opening an account. An answer may say :credit_days (the
+    // default payment term) and :claim_days (the terms of sale); the site fills them in, so the
+    // numbers never drift from the terms page. Editable on the Website screen, FAQ tab.
+    'faq' => [
+        [
+            'question' => ['id' => 'Bagaimana cara menjadi pelanggan?', 'en' => 'How do I become a customer?'],
+            'answer' => ['id' => 'Hubungi kami lewat WhatsApp, telepon, atau email dengan nama usaha dan kota Anda. Tim penjualan cabang terdekat memverifikasi usaha Anda, lalu menyepakati harga, limit kredit, dan termin pembayaran. Setelah itu Anda mendapat akses ke portal pelanggan.', 'en' => 'Message us on WhatsApp, call or email with your business name and city. The sales team of the nearest branch verifies your business, then agrees your prices, credit limit and payment terms. After that you get access to the customer portal.'],
+        ],
+        [
+            'question' => ['id' => 'Mengapa tidak ada harga di situs ini?', 'en' => 'Why are there no prices on this site?'],
+            'answer' => ['id' => 'Kami hanya menjual grosir, dan harga ditetapkan per pelanggan sesuai kesepakatan. Harga Anda tampil di portal pelanggan setelah masuk.', 'en' => 'We sell wholesale only, and prices are set per customer by agreement. Your prices show in the customer portal after you sign in.'],
+        ],
+        [
+            'question' => ['id' => 'Apakah bisa tempo (kredit)?', 'en' => 'Can I buy on credit?'],
+            'answer' => ['id' => 'Bisa, untuk pelanggan terdaftar dalam limit kredit yang disepakati. Faktur jatuh tempo :credit_days hari sejak pesanan disetujui, kecuali disepakati lain.', 'en' => 'Yes, for registered customers within the agreed credit limit. An invoice is due :credit_days days after the order is approved, unless agreed otherwise.'],
+        ],
+        [
+            'question' => ['id' => 'Bagaimana cara membayar?', 'en' => 'How do I pay?'],
+            'answer' => ['id' => 'Lewat transfer bank, tunai, atau giro. Tidak ada pembayaran online di situs ini; tim keuangan kami mencatat setiap pembayaran dan mencocokkannya dengan faktur Anda.', 'en' => 'By bank transfer, cash or giro. There is no online payment on this site; our finance team records every payment and matches it to your invoices.'],
+        ],
+        [
+            'question' => ['id' => 'Bagaimana pesanan dikirim?', 'en' => 'How is my order delivered?'],
+            'answer' => ['id' => 'Dari gudang cabang yang memegang stoknya, lewat ekspedisi rekanan kami. Setiap pengiriman disertai surat jalan, yang juga bisa Anda unduh di portal.', 'en' => 'From the warehouse of the branch that holds the stock, through our expedition partners. Every shipment comes with a surat jalan, which you can also download in the portal.'],
+        ],
+        [
+            'question' => ['id' => 'Bagaimana jika barang kurang, rusak, atau tidak sesuai?', 'en' => 'What if goods arrive short, damaged or wrong?'],
+            'answer' => ['id' => 'Sampaikan klaim paling lambat :claim_days hari kerja setelah barang diterima, dengan nomor surat jalan dan foto. Ketentuan lengkapnya ada di Syarat Penjualan.', 'en' => 'Send a claim within :claim_days working days of receiving the goods, with the surat jalan number and photos. The full rules are in the Terms of sale.'],
+        ],
+    ],
+
     // Brand names are proper nouns: one spelling only.
     'brands' => ['YUHOLI', 'OSBORN', 'ASTRO', 'STAVO', 'STAVIX', 'SERVO', 'BDAX'],
 
@@ -126,8 +156,8 @@ return [
         'nib' => env('SITE_NIB'),
         'established' => env('SITE_ESTABLISHED'),
         'privacy' => [
-            'effective_since' => '2026-10-01',
-            'version' => '1.0',
+            'effective_since' => '2026-11-04',
+            'version' => '1.1',
             'email' => env('SITE_PRIVACY_EMAIL'),
             'correction_hours' => 72,
             'breach_notice_hours' => 72,

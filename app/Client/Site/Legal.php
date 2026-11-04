@@ -87,6 +87,7 @@ final class Legal
                         [Http\SiteLocale::COOKIE, 'Mengingat bahasa yang Anda pilih untuk situs publik (Indonesia atau Inggris). Hanya dipasang bila Anda menekan tombol ganti bahasa, berlaku satu tahun, dan isinya hanya kode bahasa itu.'],
                     ]],
                     ['kind' => 'p', 'text' => 'Dua yang pertama diperlukan agar situs berfungsi, karena itu tidak tersedia pilihan untuk menolaknya selain dengan tidak memakai situs ini. Yang ketiga hanya ada bila Anda memintanya. Tidak satu pun dipakai untuk mengenali Anda antar kunjungan maupun antar situs.'],
+                    ['kind' => 'p', 'text' => 'Selain ketiga cookie itu, situs ini menyimpan satu penanda di penyimpanan lokal (local storage) peramban Anda ketika Anda menekan "Mengerti" pada pemberitahuan cookie, agar pemberitahuan itu tidak muncul lagi. Penanda itu tidak pernah dikirim ke server kami dan dapat Anda hapus kapan saja dari pengaturan peramban.'],
                     ['kind' => 'p', 'text' => 'Kami tidak memasang layanan analitik, piksel iklan, tombol media sosial, maupun pelacak pihak ketiga. Seluruh berkas halaman ini, termasuk huruf dan gambar, dilayani dari server kami sendiri. Kunjungan Anda ke halaman publik kami karena itu tidak diketahui pihak mana pun selain kami.'],
                 ]],
                 ['id' => 'keamanan', 'heading' => '8. Bagaimana data diamankan', 'blocks' => [

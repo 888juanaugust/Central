@@ -95,6 +95,17 @@ final class Copy
         return app()->getLocale() === 'en' ? 'id' : 'en';
     }
 
+    /** The wa.me link of the contact WhatsApp number, or null when none is set. A local 08… number gains the country code. */
+    public static function whatsapp(): ?string
+    {
+        $digits = self::digits((string) self::value('contact.whatsapp'));
+        if ($digits === '') {
+            return null;
+        }
+
+        return 'https://wa.me/'.(str_starts_with($digits, '0') ? '62'.substr($digits, 1) : $digits);
+    }
+
     /** Digits only, for a wa.me link. */
     public static function digits(string $number): string
     {

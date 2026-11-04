@@ -39,7 +39,7 @@ class Website extends ErpPage
 
     /** The keys the form edits, each saved as one setting. Lists (a profile's paragraphs, the partners) are one key each. */
     public const KEYS = [
-        'short_name', 'tagline', 'summary', 'profile', 'partners', 'roadmap',
+        'short_name', 'tagline', 'summary', 'profile', 'partners', 'roadmap', 'faq',
         'contact.phone', 'contact.whatsapp', 'contact.email', 'contact.city', 'contact.hours',
         'legal.entity', 'legal.nib', 'legal.established',
         'legal.privacy.effective_since', 'legal.privacy.version', 'legal.privacy.email', 'legal.privacy.correction_hours', 'legal.privacy.breach_notice_hours', 'legal.privacy.server_location',
@@ -104,6 +104,15 @@ class Website extends ErpPage
                                 ...self::pair('title', __('Title')),
                                 Select::make('status')->label(__('Status'))->options(['done' => __('Done'), 'ongoing' => __('In progress'), 'planned' => __('Planned')])->required()->native(false),
                                 ...self::pair('description', __('fields.description'), rows: 2),
+                            ]),
+                    ]),
+                    Tab::make('faq')->label(__('FAQ'))->icon(Heroicon::OutlinedQuestionMarkCircle)->schema([
+                        Repeater::make('faq')->label(__('Questions'))->columns(2)->reorderable()->collapsible()
+                            ->itemLabel(fn (array $state) => $state['question']['id'] ?? null)
+                            ->helperText(__('An answer may say :credit_days and :claim_days; the site fills in the default payment term and the claim days of the terms of sale.'))
+                            ->schema([
+                                ...self::pair('question', __('Question')),
+                                ...self::pair('answer', __('Answer'), rows: 3),
                             ]),
                     ]),
                     Tab::make('legal')->label(__('Legal'))->icon(Heroicon::OutlinedScale)->schema([

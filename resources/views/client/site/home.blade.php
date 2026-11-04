@@ -1,6 +1,10 @@
 @extends('client.site.layout')
 
-@php use App\Client\Site\Copy; @endphp
+@php
+    use App\Client\Site\Copy;
+
+    $whatsapp = Copy::whatsapp();
+@endphp
 
 @section('description', Copy::text('summary'))
 
@@ -8,23 +12,24 @@
 
     @includeWhen($promos->isNotEmpty(), 'client.site.partials.promos')
 
-    {{-- The company, and nothing but the company: one statement, two actions, and where it is. --}}
+    {{-- The company, and nothing but the company: one statement, two actions, the mark behind them, and the company at a glance. --}}
     <section class="site-hero">
         <div class="site-hero__glow" aria-hidden="true"></div>
+        <img src="{{ asset(config('client.theme.logo')) }}" alt="" aria-hidden="true" class="site-hero__mark site-mark--light">
+        <img src="{{ asset(config('client.theme.logo_dark') ?: config('client.theme.logo')) }}" alt="" aria-hidden="true" class="site-hero__mark site-mark--dark">
         <h1 class="site-hero__title">{{ Copy::text('tagline') }}</h1>
         <p class="site-hero__lede">{{ Copy::text('summary') }}</p>
         <div class="site-hero__actions">
             <a href="{{ route('site.sign_in') }}" class="site-btn site-btn--primary site-btn--lg">{{ __('Sign in to your account') }}</a>
             <a href="{{ route('site.contact') }}" class="site-btn site-btn--secondary site-btn--lg">{{ __('Become a customer') }}</a>
         </div>
-        @if ($branches->isNotEmpty())
-            <p class="site-hero__branches">
-                <span>{{ __('Shipping from :count branches:', ['count' => $branches->count()]) }}</span>
-                @foreach ($branches as $branch)
-                    <span class="site-chip">{{ $branch->name }}</span>
-                @endforeach
+        @if ($whatsapp)
+            <p class="site-hero__whatsapp">
+                <a href="{{ $whatsapp }}" target="_blank" rel="noopener">@include('client.site.partials.whatsapp-icon')<span>{{ __('Or message us on WhatsApp') }}</span></a>
             </p>
         @endif
+
+        @include('client.site.partials.glance')
     </section>
 
     {{-- What we sell: four categories, a wide and narrow rhythm rather than a row of equal cards. --}}
@@ -54,6 +59,8 @@
             @endforeach
         </ul>
     </section>
+
+    @include('client.site.partials.portal-features')
 
     {{-- Who buys from us, and how an account opens: the distance between interested and ordering. --}}
     <section class="site-section" data-reveal>
@@ -121,6 +128,8 @@
             </div>
         </div>
     </section>
+
+    @includeWhen($faq !== [], 'client.site.partials.faq')
 
     {{-- The closing action: the one blue surface on the page. --}}
     <section class="site-section" data-reveal>

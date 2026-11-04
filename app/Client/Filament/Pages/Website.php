@@ -80,7 +80,7 @@ class Website extends ErpPage
                     ]),
                     Tab::make('about')->label(__('About'))->icon(Heroicon::OutlinedBuildingOffice2)->schema([
                         Section::make()->columns(2)->schema([
-                            TextInput::make('short_name')->label(__('Short name'))->maxLength(60)->columnSpanFull()->helperText(__('In the header; the legal name comes from Preferences.')),
+                            TextInput::make('short_name')->label(__('Short name'))->maxLength(60)->columnSpanFull()->helperText(__('The name customers see on the site, in the portal and in their mail; staff see the system as :staff. The legal name comes from Preferences.', ['staff' => config('client.names.staff')])),
                             ...self::pair('tagline', __('Tagline')),
                             ...self::pair('summary', __('Summary'), rows: 3),
                             ...self::pair('profile', __('Profile'), rows: 8, help: __('One paragraph per blank line.')),

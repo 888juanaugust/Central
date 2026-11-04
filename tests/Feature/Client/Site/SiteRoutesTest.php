@@ -10,6 +10,7 @@ use App\Domain\Pengaturan\Preferensi;
 use App\Domain\Pengaturan\PreferensiKey;
 use App\Models\Company\Branch;
 use App\Models\Company\PaymentTerm;
+use App\Providers\Filament\AdminPanelProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -32,7 +33,7 @@ class SiteRoutesTest extends TestCase
             ->assertSee('<html lang="id"', false)
             ->assertSee('rel="canonical" href="'.url($path === '/' ? '' : $path).'"', false)
             ->assertSee('"@context":"https://schema.org"', false)
-            ->assertSee(config('app.name'));
+            ->assertSee('Javaindo');
         $html = $response->getContent();
 
         $this->assertDoesNotMatchRegularExpression('/\bRp\b|\bIDR\b/', $html, "{$path} shows a price");
@@ -150,6 +151,27 @@ class SiteRoutesTest extends TestCase
             ->assertSee('Only technical cookies')
             ->assertSee('href="'.route('site.privacy').'"', false);
         $this->get('/kebijakan-privasi')->assertOk()->assertSee('penyimpanan lokal');
+    }
+
+    public function test_customers_see_the_trading_name_and_staff_see_central(): void
+    {
+        app(Preferensi::class)->set(PreferensiKey::CompanyName, 'PT Java Indo Intermechanika');
+
+        $home = $this->get('/')->assertOk()
+            ->assertSee('<title>Javaindo · ', false)
+            ->assertSee('<meta property="og:site_name" content="Javaindo">', false)
+            ->assertSee('"legalName":"PT Java Indo Intermechanika"', false)
+            ->getContent();
+        $this->assertStringNotContainsString('Central', $home, 'the staff system never shows on the public site');
+        $this->get('/tentang-kami')->assertOk()->assertSee('PT Java Indo Intermechanika'); // the legal name, on the about page
+
+        $this->get('/portal/login')->assertOk()->assertSee('Javaindo · Portal')->assertDontSee('Central');
+        $this->get('/admin/login')->assertOk()->assertSee('Central')->assertDontSee('Javaindo');
+        $this->assertSame('Central', AdminPanelProvider::brandName(), 'the staff name wins over the company name');
+
+        app(SiteSettings::class)->set('short_name', 'Java Indo');
+        $this->get('/')->assertOk()->assertSee('<title>Java Indo · ', false);
+        $this->get('/portal/login')->assertOk()->assertSee('Java Indo · Portal');
     }
 
     public function test_the_sign_in_page_offers_the_portal_and_the_panel(): void

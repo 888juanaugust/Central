@@ -41,7 +41,7 @@ class DebtNoticeTest extends TestCase
 
         Mail::assertSentCount(1);
         Mail::assertSent(DebtNoticeMessage::class, function (DebtNoticeMessage $mail) use ($old): bool {
-            return $mail->invoice->is($old) && $mail->days === 121 && $mail->hasTo('toko@example.test') && $mail->hasTo($this->sales->email) && $mail->hasTo($this->marketing->email);
+            return $mail->invoice->is($old) && $mail->days === 121 && $mail->hasFrom((string) config('mail.from.address'), 'Javaindo') && $mail->hasTo('toko@example.test') && $mail->hasTo($this->sales->email) && $mail->hasTo($this->marketing->email);
         });
         $notice = DebtNotice::query()->sole();
         $this->assertSame($old->id, $notice->sales_invoice_id);

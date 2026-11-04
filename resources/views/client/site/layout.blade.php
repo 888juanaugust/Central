@@ -16,7 +16,8 @@
 
     $locale = app()->getLocale();
     $other = Copy::otherLanguage();
-    $name = Copy::name();
+    // Customers know the trading name (Javaindo); the legal name stays in the schema and on the about and legal pages.
+    $name = Copy::shortName();
     $title = trim($__env->yieldContent('title'));
     $description = trim($__env->yieldContent('description')) ?: Copy::text('summary');
     $menu = [
@@ -59,6 +60,7 @@
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
         'name' => $name,
+        'legalName' => Copy::name(),
         'url' => url('/'),
         'telephone' => (string) Copy::value('contact.phone'),
         'email' => (string) Copy::value('contact.email'),

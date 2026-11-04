@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Client\Mail;
 
+use App\Client\Site\Copy;
 use App\Domain\Company\CompanyIdentity;
 use App\Domain\Sales\Contracts\AgingDate;
 use App\Domain\Shared\Format;
 use App\Models\Sales\SalesInvoice;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
@@ -19,7 +21,11 @@ class DebtNoticeMessage extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: __('Invoice :number is :days days old', ['number' => $this->invoice->number, 'days' => $this->days]));
+        // The customer reads it: sent as the trading name they know (Javaindo).
+        return new Envelope(
+            from: new Address((string) config('mail.from.address'), Copy::shortName()),
+            subject: __('Invoice :number is :days days old', ['number' => $this->invoice->number, 'days' => $this->days]),
+        );
     }
 
     public function content(): Content

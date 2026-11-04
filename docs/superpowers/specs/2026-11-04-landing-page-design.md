@@ -32,12 +32,20 @@ keeps the site's style (the workspace's tokens, Geist, one blue, light and dark)
   data on the home page.
 - **Cookie notice**: shown once, dismissed with "Understood"; the acknowledgement lives in
   the browser's local storage, not a cookie. The privacy policy says so (version 1.1).
+- **Two names**: customers see the trading name **Javaindo** on the site (title, header,
+  footer, structured data with the legal name beside it), in the buyer portal (its brand, and
+  the app name for portal requests, so the password-reset mail signs as Javaindo) and in the
+  mail sent to them (the invitation, the debt notice: sender and subject). Staff keep
+  **Central**: `config('client.names.staff')` wins over the company's name in the panel's
+  brand. The customer name is the Website screen's short name, default
+  `config('client.names.customer')`.
 - **Real content**: stays editable on the Website and Website Images screens; Launch
   Readiness keeps flagging placeholders until the owner's values are in.
 
 ## Base edits
 
-None.
+`AdminPanelProvider::brandName()` reads `config('client.names.staff')` first (the panel's
+brand); `PanelBootTest` covers the base's rule and the override.
 
 ## Tests
 

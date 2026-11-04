@@ -4,7 +4,7 @@
         <img src="{{ asset(config('client.theme.logo')) }}" alt="" aria-hidden="true" class="site-glance__mark site-mark--light">
         <img src="{{ asset(config('client.theme.logo_dark') ?: config('client.theme.logo')) }}" alt="" aria-hidden="true" class="site-glance__mark site-mark--dark">
         <div>
-            <p class="site-glance__name">{{ \App\Client\Site\Copy::name() }}</p>
+            <p class="site-glance__name">{{ \App\Client\Site\Copy::shortName() }}</p>
             <p class="site-glance__tagline">{{ \App\Client\Site\Copy::text('tagline') }}</p>
             <p class="site-glance__serves">{{ __('Serving workshops, parts shops and distributors across Indonesia.') }}</p>
         </div>

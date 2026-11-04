@@ -23,9 +23,10 @@ final class Copy
         return app(CompanyIdentity::class)->letterhead()['name'];
     }
 
+    /** The name customers see (Javaindo): the Website screen's short name, else client.names.customer, else the legal name. */
     public static function shortName(): string
     {
-        return (string) (self::value('short_name') ?: self::name());
+        return (string) (self::value('short_name') ?: config('client.names.customer') ?: self::name());
     }
 
     public static function text(string $key): string

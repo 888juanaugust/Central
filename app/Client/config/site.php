@@ -23,8 +23,9 @@ declare(strict_types=1);
 
 return [
 
-    // The short name in the header; the legal name comes from Preferences (the letterhead).
-    'short_name' => env('SITE_SHORT_NAME', config('app.name', 'Central')),
+    // The name customers see: the site's header and title, the buyer portal, the mail sent to
+    // them (config/client.php names.customer). The legal name comes from Preferences (the letterhead).
+    'short_name' => env('CUSTOMER_NAME', 'Javaindo'),
 
     'tagline' => [
         'id' => 'Distributor grosir suku cadang otomotif',

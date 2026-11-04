@@ -3,7 +3,7 @@
 @php use App\Client\Site\Copy; @endphp
 
 @section('title', __('Sign in'))
-@section('description', __('Sign in to the :name customer portal or the staff panel.', ['name' => Copy::name()]))
+@section('description', __('Sign in to the :name customer portal or the staff panel.', ['name' => Copy::shortName()]))
 
 @section('content')
 

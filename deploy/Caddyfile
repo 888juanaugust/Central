@@ -20,6 +20,12 @@ __DOMAIN__ {
     }
 }
 
+# www answers too, so a visitor typing it gets a certificate and lands on the
+# one address the site lives at.
+www.__DOMAIN__ {
+    redir https://__DOMAIN__{uri} permanent
+}
+
 # monitor-begin
 # Grafana (deploy/monitoring), bound to loopback and reached only through
 # here: Caddy's own password first, then Grafana's login. harden.sh fills

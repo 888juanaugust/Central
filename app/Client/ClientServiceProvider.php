@@ -20,6 +20,8 @@ use App\Client\Site\Http\SiteLocale;
 use App\Client\Site\SiteSettings;
 use App\Domain\Sales\Contracts\AgingDate;
 use App\Domain\Sales\Contracts\Prices;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -89,14 +91,26 @@ class ClientServiceProvider extends ServiceProvider
         // Every sign-in attempt on either guard is audited and logged for the security watch.
         Event::subscribe(RecordsAuthEvents::class);
 
-        // The public site (sub-project 5). Registered once the application has
-        // booted, after the base's routes/web.php, so the site's "/" replaces
-        // the base's redirect to the panel: for one method and URI the route
-        // registered last wins. The route cache is built the same way.
+        // The public site (sub-project 5), registered once the application has
+        // booted, after the base's routes/web.php. The base sends "/" to the panel
+        // with Route::redirect, on every verb; the site's "/" is GET only. Without
+        // a route cache the later one wins, but the compiled matcher that
+        // `php artisan optimize` caches takes the first, so the redirect would win
+        // in production. It is dropped here, before the site is added: "/" is the
+        // landing page with or without the cache.
         $this->app->booted(function (): void {
             if ($this->app->routesAreCached()) {
                 return;
             }
+            $router = $this->app->make(Router::class);
+            $kept = new RouteCollection;
+            foreach ($router->getRoutes()->getRoutes() as $route) {
+                if ($route->uri() !== '/') {
+                    $kept->add($route);
+                }
+            }
+            $router->setRoutes($kept);
+
             Route::middleware(['web', SiteLocale::class, SiteContentSecurityPolicy::class])->group(__DIR__.'/routes/site.php');
         });
     }

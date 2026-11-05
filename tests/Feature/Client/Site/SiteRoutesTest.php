@@ -11,6 +11,8 @@ use App\Domain\Pengaturan\PreferensiKey;
 use App\Models\Company\Branch;
 use App\Models\Company\PaymentTerm;
 use App\Providers\Filament\AdminPanelProvider;
+use Illuminate\Http\Request;
+use Illuminate\Routing\CompiledRouteCollection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -45,6 +47,21 @@ class SiteRoutesTest extends TestCase
     public function test_the_root_is_the_site_and_no_longer_a_redirect_to_the_panel(): void
     {
         $this->get('/')->assertOk()->assertSee('<main', false);
+    }
+
+    public function test_the_root_is_the_landing_page_with_the_route_cache_too(): void
+    {
+        $routes = app('router')->getRoutes();
+        $root = array_values(array_filter($routes->getRoutes(), fn ($route) => $route->uri() === '/'));
+        $this->assertCount(1, $root, 'one route for "/": the base\'s redirect to the panel is gone');
+        $this->assertSame('site.home', $root[0]->getName());
+
+        // What `php artisan optimize` caches in production: the compiled matcher takes the first
+        // route registered for a URI, so a leftover redirect would win there and not here.
+        $compiled = $routes->compile();
+        $cached = (new CompiledRouteCollection($compiled['compiled'], $compiled['attributes']))
+            ->setRouter(app('router'))->setContainer(app());
+        $this->assertSame('site.home', $cached->match(Request::create('/', 'GET'))->getName());
     }
 
     public function test_the_site_carries_a_second_stricter_content_policy_the_panels_do_not(): void

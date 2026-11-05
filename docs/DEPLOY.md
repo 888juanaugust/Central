@@ -80,7 +80,8 @@ is the same list on the command line and exits 0 only when nothing is.
 `deploy/Caddyfile`, installed by `provision.sh` with the domain filled in. Caddy gets and
 renews the certificate. The application sends its own security headers (content policy,
 frame and content-type rules, referrer policy, HSTS over HTTPS); nothing conflicting goes
-in Caddy.
+in Caddy. `www.` gets its own certificate and a permanent redirect to the bare domain, so
+point both `@` and `www` at the server.
 
 ## 5. Queue worker and scheduler
 

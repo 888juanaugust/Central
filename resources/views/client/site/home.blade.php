@@ -6,57 +6,32 @@
 
 @section('content')
 
-    @includeWhen($promos->isNotEmpty(), 'client.site.partials.promos')
-
-    {{-- The company, and nothing but the company: one statement, two actions, and where it is. --}}
+    {{-- The company in one card: the workspace's rail colour, one statement, two actions, and a bearing that turns as the page scrolls. --}}
     <section class="site-hero">
-        <div class="site-hero__glow" aria-hidden="true"></div>
-        <h1 class="site-hero__title">{{ Copy::text('tagline') }}</h1>
-        <p class="site-hero__lede">{{ Copy::text('summary') }}</p>
-        <div class="site-hero__actions">
-            <a href="{{ route('site.sign_in') }}" class="site-btn site-btn--primary site-btn--lg">{{ __('Sign in to your account') }}</a>
-            <a href="{{ route('site.contact') }}" class="site-btn site-btn--secondary site-btn--lg">{{ __('Become a customer') }}</a>
+        <div class="site-hero__body">
+            <h1 class="site-hero__title">{{ Copy::text('tagline') }}</h1>
+            <p class="site-hero__lede">{{ Copy::text('summary') }}</p>
+            <div class="site-hero__actions">
+                <a href="{{ route('site.contact') }}" class="site-btn site-btn--primary site-btn--lg">{{ __('Become a customer') }}</a>
+                <a href="{{ route('site.sign_in') }}" class="site-btn site-btn--secondary site-btn--lg">{{ __('Sign in to your account') }}</a>
+            </div>
+            @if ($branches->isNotEmpty())
+                <p class="site-hero__branches">{{ __('Shipping from :count branches:', ['count' => $branches->count()]) }} {{ $branches->pluck('name')->join(', ') }}</p>
+            @endif
         </div>
-        @if ($branches->isNotEmpty())
-            <p class="site-hero__branches">
-                <span>{{ __('Shipping from :count branches:', ['count' => $branches->count()]) }}</span>
-                @foreach ($branches as $branch)
-                    <span class="site-chip">{{ $branch->name }}</span>
-                @endforeach
-            </p>
-        @endif
+        @include('client.site.partials.drawings.hero-bearing', ['class' => 'site-hero__drawing', 'spin' => 'site-hero__spin'])
     </section>
 
-    {{-- What we sell: four categories, a wide and narrow rhythm rather than a row of equal cards. --}}
-    <section class="site-section" data-reveal>
-        <div class="site-section__head">
-            <h2 class="site-h2">{{ __('Product categories') }}</h2>
-            <p class="site-lede">{{ __('The parts a workshop replaces most often, carried in depth rather than in breadth.') }}</p>
-        </div>
-        <div class="site-categories">
-            @foreach ($categories as $i => $category)
-                <article @class(['site-category', 'site-category--wide' => in_array($i % 4, [0, 3], true), 'site-category--tinted' => $i % 4 === 0])>
-                    <span class="site-category__icon">@include('client.site.partials.category-icon', ['name' => $category['name']])</span>
-                    <h3 class="site-category__name">{{ $category['name'] }}</h3>
-                    <p class="site-category__text">{{ $category['description'] }}</p>
-                </article>
-            @endforeach
-        </div>
-        <p class="site-note">{{ __('The full list with your own prices is in the customer portal after sign-in.') }}</p>
-    </section>
-
-    {{-- Brands: the names are the content. --}}
-    <section class="site-section site-section--tight" data-reveal>
-        <h2 class="site-h2 site-h2--center">{{ __('Brands we carry') }}</h2>
-        <ul class="site-brands">
-            @foreach (Copy::list('brands') as $brand)
-                <li class="site-brand-tile">{{ $brand }}</li>
-            @endforeach
-        </ul>
-    </section>
+    {{-- One slot under the hero. Live promos take it and the categories stand as cards; with none, the categories take it. A category never shows twice. --}}
+    @if ($promos->isNotEmpty())
+        @include('client.site.partials.promos')
+        @includeWhen(count($categories) > 0, 'client.site.partials.category-grid')
+    @else
+        @includeWhen(count($categories) > 0, 'client.site.partials.category-carousel')
+    @endif
 
     {{-- Who buys from us, and how an account opens: the distance between interested and ordering. --}}
-    <section class="site-section" data-reveal>
+    <section class="site-section">
         <div class="site-two-col">
             <div>
                 <h2 class="site-h2">{{ __('Who we serve') }}</h2>
@@ -90,7 +65,7 @@
     @includeWhen($photos->isNotEmpty(), 'client.site.partials.photos')
 
     {{-- About, with the partners condensed beside it. --}}
-    <section class="site-section" data-reveal>
+    <section class="site-section">
         <div class="site-two-col">
             <div>
                 <h2 class="site-h2">{{ __('About the company') }}</h2>
@@ -101,7 +76,7 @@
             </div>
             <div>
                 <div class="site-row-head">
-                    <h2 class="site-h3">{{ __('Our partners') }}</h2>
+                    <h2 class="site-h2">{{ __('Our partners') }}</h2>
                     <a href="{{ route('site.partners') }}" class="site-link site-link--sm">{{ __('All partners') }} @include('client.site.partials.arrow')</a>
                 </div>
                 <ul class="site-list">
@@ -122,14 +97,18 @@
         </div>
     </section>
 
-    {{-- The closing action: the one blue surface on the page. --}}
-    <section class="site-section" data-reveal>
+    {{-- The closing action: flat accent, the one blue surface on the page, the second door for those already in. --}}
+    <section class="site-section">
         <div class="site-cta">
+            @include('client.site.partials.drawings.hero-bearing', ['class' => 'site-cta__drawing', 'spin' => 'site-cta__spin'])
             <div>
-                <h2 class="site-cta__title">{{ __('Already a customer?') }}</h2>
-                <p class="site-cta__lede">{{ __('Repeat your last order, check your free credit and download your invoices in the portal.') }}</p>
+                <h2 class="site-cta__title">{{ __('Open a wholesale account') }}</h2>
+                <p class="site-cta__lede">{{ __('Send your business name, city and the kind of parts you need.') }}</p>
             </div>
-            <a href="{{ route('site.sign_in') }}" class="site-btn site-btn--on-accent site-btn--lg">{{ __('Sign in to your account') }}</a>
+            <div class="site-cta__actions">
+                <a href="{{ route('site.contact') }}" class="site-btn site-btn--on-accent site-btn--lg">{{ __('Become a customer') }}</a>
+                <a href="{{ route('site.sign_in') }}" class="site-cta__link">{{ __('Already a customer? Sign in') }}</a>
+            </div>
         </div>
     </section>
 

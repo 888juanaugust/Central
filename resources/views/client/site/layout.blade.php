@@ -26,6 +26,8 @@
         'site.roadmap' => __('Roadmap'),
         'site.contact' => __('Contact'),
     ];
+    // The roadmap is for those already looking: the footer carries it, the header stays with what a buyer needs.
+    $headerMenu = array_diff_key($menu, ['site.roadmap' => true]);
     $branches = \App\Models\Company\Branch::query()->where('is_active', true)->orderBy('code')->get();
 @endphp
 <!DOCTYPE html>
@@ -85,7 +87,7 @@
             </a>
 
             <div class="site-nav__links">
-                @foreach ($menu as $route => $label)
+                @foreach ($headerMenu as $route => $label)
                     <a href="{{ route($route) }}" @class(['site-nav__link', 'is-current' => request()->routeIs($route)]) @if (request()->routeIs($route)) aria-current="page" @endif>{{ $label }}</a>
                 @endforeach
             </div>
@@ -101,7 +103,7 @@
         </nav>
 
         <div id="site-menu" class="site-menu" hidden>
-            @foreach ($menu as $route => $label)
+            @foreach ($headerMenu as $route => $label)
                 <a href="{{ route($route) }}" @class(['site-menu__link', 'is-current' => request()->routeIs($route)])>{{ $label }}</a>
             @endforeach
             <a href="{{ route('site.language', $other) }}" hreflang="{{ $other }}" lang="{{ $other }}" class="site-menu__link">{{ __('Read this site in :language', ['language' => \App\Domain\Shared\Locales::names()[$other]]) }}</a>

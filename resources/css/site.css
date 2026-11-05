@@ -41,7 +41,15 @@
     --duration-fast: 250ms;
     --duration-medium: 350ms;
     --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
-    --site-glow: rgb(47 91 234 / 0.16);
+    --ae-rail-bg: #1d2433;
+    --ae-rail-icon: #c3cbdc;
+    --ae-rail-icon-active: #ffffff;
+    --ae-tabstrip-line: #cbd2e0;
+    --ae-tile-setup-bg: #eaf0fd;
+    --ae-tile-setup-fg: #2f5bea;
+    --scale-large: 0.96;
+    --site-band-accent: #97afee; /* The accent as DESIGN.md gives it on a dark ground: the hero stays dark in both themes. */
+    --site-on-accent-soft: color-mix(in srgb, var(--ae-on-accent) 82%, transparent);
     color-scheme: light dark;
 }
 
@@ -65,9 +73,12 @@
         --ae-neutral-bg: #232937;
         --ae-neutral-fg: #c0c7d4;
         --ae-shadow-card: 0 1px 1px rgb(0 0 0 / 0.3), 0 12px 28px -8px rgb(0 0 0 / 0.5);
-        --ae-shadow-pop: 0 4px 8px rgb(0 0 0 / 0.3), 0 24px 48px -12px rgb(0 0 0 / 0.6);
-        --ae-shadow-btn: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 2px 6px rgb(0 0 0 / 0.4);
-        --site-glow: rgb(151 175 238 / 0.12);
+        --ae-shadow-pop: 0 4px 8px rgb(0 0 0 / 0.35), 0 24px 48px -12px rgb(0 0 0 / 0.6);
+        --ae-shadow-btn: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 2px 6px rgb(0 0 0 / 0.4);
+        --ae-rail-bg: #0b0e14;
+        --ae-tabstrip-line: #2a3142;
+        --ae-tile-setup-bg: #1a1e29;
+        --ae-tile-setup-fg: #a3b6e8;
     }
 }
 
@@ -215,7 +226,7 @@
     }
     .site-row-head {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         justify-content: space-between;
         gap: 1rem;
         padding-bottom: 0.75rem;
@@ -437,11 +448,11 @@
         border-color: color-mix(in oklab, var(--ae-ink) 30%, transparent);
     }
     .site-btn--on-accent {
-        background: #ffffff;
-        color: #2f5bea;
+        background: var(--ae-on-accent);
+        color: var(--ae-accent-fill);
     }
     .site-btn--on-accent:hover {
-        background: #e6ebfc;
+        background: color-mix(in oklab, var(--ae-on-accent) 88%, var(--ae-accent-fill));
     }
     .site-link {
         display: inline-flex;
@@ -467,16 +478,6 @@
         width: 1rem;
         height: 1rem;
     }
-    .site-chip {
-        display: inline-block;
-        padding: 0.2rem 0.625rem;
-        border-radius: var(--ae-radius-full);
-        background: var(--ae-surface);
-        border: 1px solid var(--ae-card-edge);
-        font-size: 0.8125rem;
-        font-weight: 500;
-        color: var(--ae-ink);
-    }
     .site-badge {
         display: inline-flex;
         align-items: center;
@@ -501,66 +502,149 @@
     .site-badge--success { background: var(--ae-success-bg); color: var(--ae-success-fg); }
     .site-badge--info { background: var(--ae-info-bg); color: var(--ae-info-fg); }
     .site-badge--neutral { background: var(--ae-neutral-bg); color: var(--ae-neutral-fg); }
-    .site-badge--on-accent { background: rgb(255 255 255 / 0.18); color: #ffffff; }
+    .site-badge--on-accent { background: color-mix(in srgb, var(--ae-on-accent) 18%, transparent); color: var(--ae-on-accent); }
 
-    /* Hero */
+    /* Line drawings: one stroke, drafting's dash-dot for a centre line. */
+    .site-line--center {
+        stroke-dasharray: 18 5 3 5;
+        stroke-opacity: 0.5;
+        stroke-width: 1;
+    }
+    .site-line--soft {
+        stroke-opacity: 0.55;
+    }
+    .site-line--faint {
+        stroke-dasharray: 3 4;
+        stroke-opacity: 0.35;
+        stroke-width: 1;
+    }
+    .site-line--wire {
+        stroke-linecap: round;
+        stroke-width: 2.25;
+    }
+    .site-hero__drawing :is(path, circle),
+    .site-cta__drawing :is(path, circle),
+    .site-promo__drawing > :is(path, circle, rect),
+    .site-category__drawing > :is(path, circle, rect) {
+        vector-effect: non-scaling-stroke;
+    }
+
+    /* Hero: the workspace's rail colour as one card, a bearing as the picture. */
     .site-hero {
         position: relative;
         overflow: hidden;
-        margin-inline: auto;
+        margin: 1rem auto 0;
         width: min(100% - 2rem, 72rem);
-        padding: clamp(3.5rem, 9vw, 7rem) 0 clamp(1rem, 3vw, 2rem);
-        text-align: center;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-rail-bg);
+        color: var(--ae-rail-icon-active);
+        box-shadow: var(--ae-shadow-card);
     }
-    .site-hero__glow {
-        position: absolute;
-        inset: auto 0 0;
-        height: 70%;
-        pointer-events: none;
-        background: radial-gradient(ellipse 55% 60% at 50% 100%, var(--site-glow), transparent 70%);
+    .site-hero__body {
+        position: relative;
+        z-index: 1;
+        padding: clamp(2rem, 6vw, 4.5rem) clamp(1.25rem, 5vw, 3.5rem) clamp(2rem, 4vw, 3rem);
     }
     .site-hero__title {
-        position: relative;
-        margin-inline: auto;
-        max-width: 18ch;
-        font-size: clamp(2.25rem, 1.4rem + 4vw, 4.25rem);
+        max-width: 15ch;
+        font-size: clamp(2.25rem, 1.4rem + 3.4vw, 3.75rem);
         font-weight: 600;
         letter-spacing: -0.035em;
         line-height: 1.04;
         text-wrap: balance;
     }
     .site-hero__lede {
-        position: relative;
-        margin: 1.5rem auto 0;
-        max-width: 40rem;
-        font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
-        color: var(--ae-muted);
+        margin-top: 1.25rem;
+        max-width: 36rem;
+        font-size: clamp(1rem, 0.96rem + 0.25vw, 1.125rem);
+        color: var(--ae-rail-icon);
         text-wrap: pretty;
     }
     .site-hero__actions {
-        position: relative;
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
         gap: 0.625rem;
-        margin-top: 2.25rem;
+        margin-top: 2rem;
     }
     .site-hero__branches {
-        position: relative;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-        margin-top: 2.5rem;
+        margin-top: 1.5rem;
         font-size: 0.875rem;
-        color: var(--ae-muted);
+        color: var(--ae-rail-icon);
+    }
+    .site-hero__drawing {
+        display: block;
+        width: 22rem;
+        margin: -1rem -7rem -6rem auto;
+        color: var(--ae-rail-icon);
+        stroke: currentColor;
+        stroke-width: 1.5;
+    }
+    .site-hero__drawing .site-line--bright,
+    .site-hero__drawing .site-line--center {
+        stroke: var(--site-band-accent);
+    }
+    @media (min-width: 64rem) {
+        .site-hero {
+            display: grid;
+            min-height: 36rem;
+        }
+        .site-hero__body {
+            align-self: center;
+            padding-right: 46%;
+        }
+        .site-hero__drawing {
+            position: absolute;
+            top: 50%;
+            right: -9rem;
+            width: 42rem;
+            margin: 0;
+            transform: translateY(-54%);
+        }
     }
 
-    /* Categories */
+    /* Categories, while promos hold the carousel: white cards as in the panel, a drawing rather than an icon. */
     .site-categories {
         display: grid;
         gap: 0.875rem;
+    }
+    .site-category {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+        transition: border-color var(--duration-quick) var(--ease-smooth-out);
+    }
+    .site-category:hover {
+        border-color: var(--ae-accent-soft);
+    }
+    .site-category__drawing {
+        display: block;
+        order: -1;
+        width: 100%;
+        max-width: 22rem;
+        margin-inline: auto;
+        color: var(--ae-accent);
+        stroke: currentColor;
+        stroke-width: 1.5;
+    }
+    .site-category__copy {
+        margin-top: auto;
+    }
+    .site-category__name {
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+    .site-category__text {
+        margin-top: 0.375rem;
+        max-width: 28rem;
+        font-size: 0.9375rem;
+        color: var(--ae-muted);
     }
     @media (min-width: 48rem) {
         .site-categories {
@@ -568,111 +652,24 @@
         }
         .site-category {
             grid-column: span 5;
-            min-height: 13rem;
+            min-height: 20rem;
         }
         .site-category--wide {
             grid-column: span 7;
+            flex-direction: row;
+            align-items: flex-end;
+            gap: 2rem;
         }
-    }
-    .site-category {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        overflow: hidden;
-        padding: 1.5rem;
-        border: 1px solid var(--ae-card-edge);
-        border-radius: var(--ae-radius);
-        background: var(--ae-surface);
-        box-shadow: var(--ae-shadow-card);
-        transition: transform var(--duration-fast) var(--ease-smooth-out), box-shadow var(--duration-fast) var(--ease-smooth-out);
-    }
-    .site-category:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--ae-shadow-pop);
-    }
-    .site-category--tinted {
-        border-color: transparent;
-        background: linear-gradient(135deg, var(--ae-accent-fill), color-mix(in oklab, var(--ae-accent-fill) 70%, #0b1f5c));
-        color: #ffffff;
-    }
-    .site-category--tinted::after {
-        content: '';
-        position: absolute;
-        top: -4rem;
-        right: -2.5rem;
-        width: 16rem;
-        height: 16rem;
-        border-radius: 50%;
-        border: 36px solid rgb(255 255 255 / 0.08);
-        pointer-events: none;
-    }
-    .site-category__icon {
-        position: relative;
-        display: inline-grid;
-        place-items: center;
-        width: 2.5rem;
-        height: 2.5rem;
-        border-radius: var(--ae-radius-md);
-        background: var(--ae-accent-soft);
-        color: var(--ae-accent);
-    }
-    .site-category--tinted .site-category__icon {
-        background: rgb(255 255 255 / 0.15);
-        color: #ffffff;
-    }
-    .site-category__icon svg {
-        width: 1.25rem;
-        height: 1.25rem;
-    }
-    .site-category__name {
-        position: relative;
-        margin-top: 1.75rem;
-        font-size: 1.25rem;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-    }
-    .site-category__text {
-        position: relative;
-        margin-top: 0.375rem;
-        max-width: 28rem;
-        font-size: 0.9375rem;
-        color: var(--ae-muted);
-    }
-    .site-category--tinted .site-category__text {
-        color: rgb(255 255 255 / 0.8);
-    }
-
-    /* Brands */
-    .site-brands {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.625rem;
-        margin: 1.75rem auto 0;
-        max-width: 64rem;
-    }
-    @media (min-width: 40rem) {
-        .site-brands { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    }
-    @media (min-width: 64rem) {
-        .site-brands { grid-template-columns: repeat(7, minmax(0, 1fr)); }
-    }
-    .site-brand-tile {
-        display: grid;
-        place-items: center;
-        padding: 1.25rem 0.75rem;
-        border: 1px solid var(--ae-card-edge);
-        border-radius: var(--ae-radius-md);
-        background: var(--ae-surface);
-        font-size: 0.8125rem;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--ae-accent);
-        transition: border-color var(--duration-quick) var(--ease-smooth-out);
-    }
-    .site-brand-tile:hover {
-        border-color: var(--ae-accent-soft);
+        .site-category--wide .site-category__copy {
+            flex: 0 0 36%;
+        }
+        .site-category--wide .site-category__drawing {
+            order: 2;
+            flex: 1;
+            align-self: center;
+            min-width: 0;
+            max-width: none;
+        }
     }
 
     /* Definition rows, steps, lists */
@@ -734,10 +731,6 @@
         color: var(--ae-accent);
         font-weight: 600;
         font-variant-numeric: tabular-nums;
-    }
-    .site-step:first-child .site-step__number {
-        background: var(--ae-accent-fill);
-        color: var(--ae-on-accent);
     }
     .site-step__title {
         font-size: 1.0625rem;
@@ -805,6 +798,31 @@
         color: var(--ae-muted);
     }
 
+    /* A list sits on a white card, as every table in the panel does: the line token shows on white, not on the canvas. */
+    .site-dl,
+    .site-steps,
+    .site-list {
+        padding-inline: 1.25rem;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-dl__row:last-child,
+    .site-step:last-child,
+    .site-list__row:last-child {
+        border-bottom: 0;
+    }
+    /* Already on a card: no second one. */
+    .site-card .site-list {
+        padding-inline: 0;
+        border: 0;
+        border-top: 1px solid var(--ae-line);
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+    }
+
     /* Cards */
     .site-card {
         padding: 1.75rem;
@@ -857,25 +875,18 @@
         color: var(--ae-ink);
     }
 
-    /* CTA band */
+    /* Closing band: flat accent, the panel's radius and card shadow, a faint bearing behind. */
     .site-cta {
         position: relative;
         display: flex;
         flex-direction: column;
         gap: 2rem;
-        overflow: hidden;
+        overflow: clip;
         padding: clamp(2.5rem, 5vw, 3.5rem);
-        border-radius: 22px;
-        background: linear-gradient(160deg, #0b3a9c, var(--ae-accent-fill) 55%, #1b3f9e);
-        color: #ffffff;
-        box-shadow: var(--ae-shadow-pop);
-    }
-    .site-cta::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background: radial-gradient(ellipse 40% 80% at 90% 50%, rgb(255 255 255 / 0.1), transparent 70%);
+        border-radius: var(--ae-radius);
+        background: var(--ae-accent-fill);
+        color: var(--ae-on-accent);
+        box-shadow: var(--ae-shadow-card);
     }
     @media (min-width: 40rem) {
         .site-cta {
@@ -883,6 +894,17 @@
             align-items: center;
             justify-content: space-between;
         }
+    }
+    .site-cta__drawing {
+        position: absolute;
+        top: -9rem;
+        right: -7rem;
+        width: 30rem;
+        color: var(--ae-on-accent);
+        stroke: currentColor;
+        stroke-width: 1.25;
+        opacity: 0.22;
+        pointer-events: none;
     }
     .site-cta__title {
         position: relative;
@@ -896,11 +918,21 @@
         margin-top: 0.5rem;
         max-width: 34rem;
         font-size: 1.0625rem;
-        color: rgb(255 255 255 / 0.82);
+        color: var(--site-on-accent-soft);
     }
-    .site-cta .site-btn {
+    .site-cta__actions {
         position: relative;
+        display: flex;
         flex-shrink: 0;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1rem 1.25rem;
+    }
+    .site-cta__link {
+        font-size: 0.9375rem;
+        font-weight: 500;
+        color: var(--ae-on-accent);
+        text-decoration: underline;
     }
 
     /* Inner page heading */
@@ -978,7 +1010,7 @@
     .site-article__dl > div {
         padding: 1rem;
         border: 1px solid var(--ae-line);
-        border-radius: 12px;
+        border-radius: var(--ae-radius-md);
     }
     .site-article__dl dt {
         font-weight: 600;
@@ -1038,8 +1070,8 @@
     }
     .site-door--primary {
         border-color: transparent;
-        background: linear-gradient(160deg, #0b3a9c, var(--ae-accent-fill) 55%, #1b3f9e);
-        color: #ffffff;
+        background: var(--ae-accent-fill);
+        color: var(--ae-on-accent);
     }
     .site-door__title {
         margin-top: 1.25rem;
@@ -1052,7 +1084,7 @@
         color: var(--ae-muted);
     }
     .site-door--primary .site-door__text {
-        color: rgb(255 255 255 / 0.82);
+        color: var(--site-on-accent-soft);
     }
     .site-door__cta {
         display: inline-flex;
@@ -1139,7 +1171,7 @@
         }
     }
 
-    /* The one authored motion: sections settle in as they arrive, from an already visible default. */
+    /* The inner pages: a section settles in as it arrives, from an already visible default. The home has its parallax instead. */
     @media (prefers-reduced-motion: no-preference) {
         .js [data-reveal] {
             opacity: 0;
@@ -1154,31 +1186,26 @@
 }
 
 @layer components {
-    /* Promo carousel: one frame, the active slide on top, the rest held underneath. */
-    .site-promos {
+    /*
+     * The carousel: one slot under the hero, the Owner's promos when any are live, the categories until then.
+     * One frame, the active slide on top, the rest held underneath. Clipped with overflow: clip, not hidden:
+     * hidden would make the card its own scroller and detach the drawing's parallax from the page.
+     */
+    .site-promos__frame {
         position: relative;
-        margin: 1.25rem auto 0;
-        width: min(100% - 2rem, 72rem);
     }
     .site-promos__track {
-        position: relative;
         display: grid;
-        overflow: hidden;
+        overflow: clip;
+        border: 1px solid var(--ae-card-edge);
         border-radius: var(--ae-radius);
-        box-shadow: var(--ae-shadow-card);
         background: var(--ae-surface);
-        aspect-ratio: 5 / 2;
-    }
-    @media (max-width: 40rem) {
-        .site-promos__track {
-            aspect-ratio: 4 / 3;
-        }
+        box-shadow: var(--ae-shadow-card);
     }
     .site-promo {
         grid-area: 1 / 1;
-        position: relative;
-        display: flex;
-        align-items: flex-end;
+        display: grid;
+        align-items: stretch;
         opacity: 0;
         visibility: hidden;
         transition: opacity var(--duration-medium) var(--ease-smooth-out), visibility 0s var(--duration-medium);
@@ -1188,77 +1215,213 @@
         visibility: visible;
         transition-delay: 0s;
     }
-    .site-promo__image {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
     .site-promo__body {
-        position: relative;
         display: grid;
-        gap: 0.5rem;
+        align-content: center;
         justify-items: start;
-        width: 100%;
-        padding: clamp(1.25rem, 4vw, 2.5rem);
-        background: linear-gradient(to top, rgb(13 18 30 / 0.82), rgb(13 18 30 / 0.35) 60%, transparent);
-        color: #ffffff;
+        gap: 0.625rem;
+        padding: clamp(1.5rem, 4vw, 3rem);
     }
     .site-promo__title {
-        font-size: clamp(1.375rem, 1rem + 1.6vw, 2.25rem);
+        font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.1rem);
         font-weight: 600;
         letter-spacing: -0.02em;
-        line-height: 1.1;
+        line-height: 1.15;
         text-wrap: balance;
     }
     .site-promo__text {
         max-width: 36rem;
-        color: rgb(255 255 255 / 0.85);
+        color: var(--ae-muted);
+        text-wrap: pretty;
     }
-    .site-promo__body .site-btn {
-        margin-top: 0.5rem;
+    .site-promo__until {
+        font-size: 0.875rem;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
     }
-    .site-promos__controls {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem;
-        margin-top: 0.75rem;
+    .site-promo .site-link {
+        margin-top: 0.625rem;
     }
+    .site-promo__plate {
+        display: grid;
+        place-items: center;
+        overflow: clip;
+        min-height: 14rem;
+        padding: 1rem;
+        background: var(--ae-tile-setup-bg);
+    }
+    .site-promo__drawing {
+        display: block;
+        width: 100%;
+        max-width: 38rem;
+        color: var(--ae-tile-setup-fg);
+        stroke: currentColor;
+        stroke-width: 1.5;
+    }
+    /* A post is shown whole: never object-fit: cover, its words reach the edges. */
+    .site-promo__poster {
+        display: block;
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 30rem;
+        border-radius: var(--ae-radius-sm);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-promo--poster .site-promo__plate {
+        padding: 1.25rem;
+    }
+    @media (min-width: 48rem) {
+        .site-promo--category {
+            grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+            min-height: 23rem;
+        }
+        .site-promo--poster {
+            grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+            min-height: 33rem;
+        }
+    }
+
+    /* The category strip is the workspace's tab strip: text tabs, the active one ink over a 2px accent line. */
+    .site-promos__strip {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-bottom: 0.875rem;
+        border-bottom: 1px solid var(--ae-tabstrip-line);
+    }
+    @media (min-width: 48rem) {
+        .site-promos__strip {
+            display: flex;
+            gap: 1.75rem;
+        }
+    }
+    .site-promos__tab {
+        position: relative;
+        min-height: 2.75rem;
+        padding: 0.5rem 0;
+        text-align: left;
+        font-size: 0.84375rem;
+        font-weight: 500;
+        color: var(--ae-muted);
+        cursor: pointer;
+        transition: color var(--duration-quick) var(--ease-smooth-out);
+    }
+    .site-promos__tab:hover {
+        color: var(--ae-ink);
+    }
+    .site-promos__tab[aria-current='true'] {
+        font-weight: 600;
+        color: var(--ae-ink);
+    }
+    .site-promos__tab::after {
+        content: '';
+        position: absolute;
+        inset: auto 0 -1px;
+        height: 2px;
+        background: var(--ae-accent);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform var(--duration-fast) var(--ease-smooth-out);
+    }
+    .site-promos__tab[aria-current='true']::after {
+        transform: scaleX(1);
+    }
+
+    /* Previous and next stand on the slide's left and right edges: half on the card where the page has a gutter, inside it where not. */
     .site-promos__arrow {
+        position: absolute;
+        z-index: 2;
+        top: 50%;
         display: inline-grid;
         place-items: center;
-        width: 2.25rem;
-        height: 2.25rem;
+        width: 2.75rem;
+        height: 2.75rem;
+        margin-top: -1.375rem;
         border: 1px solid var(--ae-card-edge);
         border-radius: var(--ae-radius-full);
         background: var(--ae-surface);
-        color: var(--ae-muted);
-        transition: color var(--duration-quick) var(--ease-smooth-out), border-color var(--duration-quick) var(--ease-smooth-out);
+        color: var(--ae-ink);
+        box-shadow: var(--ae-shadow-card);
+        cursor: pointer;
+        transition: border-color var(--duration-quick) var(--ease-smooth-out), scale var(--duration-quick) var(--ease-smooth-out);
     }
     .site-promos__arrow:hover {
-        color: var(--ae-ink);
-        border-color: var(--ae-accent-soft);
+        border-color: var(--ae-accent);
+    }
+    .site-promos__arrow:active {
+        scale: var(--scale-large);
     }
     .site-promos__arrow svg {
         width: 1rem;
         height: 1rem;
     }
+    .site-promos__arrow--prev {
+        left: 0.5rem;
+    }
+    .site-promos__arrow--next {
+        right: 0.5rem;
+    }
+    @media (min-width: 80rem) {
+        .site-promos__arrow--prev {
+            left: -1.375rem;
+        }
+        .site-promos__arrow--next {
+            right: -1.375rem;
+        }
+    }
+    @media (max-width: 47.99rem) {
+        /* A phone stacks the slide. On a category the arrows sit on the drawing, which narrows to leave them room. */
+        .site-promos--categories .site-promos__arrow {
+            top: auto;
+            bottom: 5.5rem;
+            margin-top: 0;
+        }
+        .site-promo--category .site-promo__plate {
+            padding-inline: 3.5rem;
+        }
+        /* A post's words stay readable: the arrows leave it and flank the dots. */
+        .site-promos--posters .site-promos__arrow {
+            top: auto;
+            bottom: -3.5rem;
+            margin-top: 0;
+        }
+        .site-promos--posters .site-promos__arrow--prev {
+            left: 0;
+        }
+        .site-promos--posters .site-promos__arrow--next {
+            right: 0;
+        }
+    }
+
+    /* Dots for the promos: the dot is small, the button is a thumb wide. */
+    .site-promos__dots-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.75rem;
+        margin-top: 0.75rem;
+    }
     .site-promos__dots {
         display: flex;
-        gap: 0.375rem;
     }
     .site-promos__dot {
+        display: grid;
+        place-items: center;
+        width: 1.5rem;
+        height: 2.75rem;
+        cursor: pointer;
+    }
+    .site-promos__dot::before {
+        content: '';
         width: 0.5rem;
         height: 0.5rem;
         border-radius: 50%;
-        background: var(--ae-line);
-        transition: background var(--duration-quick) var(--ease-smooth-out), transform var(--duration-quick) var(--ease-smooth-out);
+        background: var(--ae-tabstrip-line);
+        transition: background var(--duration-quick) var(--ease-smooth-out), scale var(--duration-quick) var(--ease-smooth-out);
     }
-    .site-promos__dot[aria-current='true'] {
+    .site-promos__dot[aria-current='true']::before {
         background: var(--ae-accent);
-        transform: scale(1.25);
+        scale: 1.25;
     }
 
     /* Gallery */
@@ -1294,5 +1457,50 @@
         padding: 0.75rem 1rem;
         font-size: 0.875rem;
         color: var(--ae-muted);
+    }
+
+    /*
+     * The home's one motion, CSS only: no script, nothing on the main thread to tune, so the strict content policy
+     * and the bundle stay as they were. The bearing turns as the page scrolls, because that is what a bearing does;
+     * the drawings drift against their cards. Where the browser lacks scroll timelines, or the visitor asks for
+     * reduced motion, the page simply stands still. A poster never moves: its words have to be read.
+     */
+    @media (prefers-reduced-motion: no-preference) {
+        @supports (animation-timeline: scroll()) {
+            .site-hero__drawing {
+                animation: site-sink linear both;
+                animation-timeline: scroll(root block);
+                animation-range: 0 100vh;
+            }
+            .site-hero__spin,
+            .site-cta__spin {
+                transform-box: view-box;
+                transform-origin: 50% 50%;
+            }
+            .site-hero__spin {
+                animation: site-turn linear both;
+                animation-timeline: scroll(root block);
+                animation-range: 0 120vh;
+            }
+            .site-promo__drawing,
+            .site-cta__drawing {
+                animation: site-drift linear both;
+                animation-timeline: view(block);
+            }
+            .site-cta__spin {
+                animation: site-turn linear both;
+                animation-timeline: view(block);
+            }
+        }
+    }
+    @keyframes site-sink {
+        to { translate: 0 7rem; }
+    }
+    @keyframes site-turn {
+        to { rotate: 110deg; }
+    }
+    @keyframes site-drift {
+        from { translate: 0 -2.25rem; }
+        to { translate: 0 2.25rem; }
     }
 }

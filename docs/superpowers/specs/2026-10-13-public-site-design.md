@@ -90,6 +90,17 @@ and optional dates**; **no public catalogue**.
   rotates several, pauses on hover and focus, stops under reduced motion) and the live
   photos as a gallery with captions. The sitemap's `lastmod` is the latest setting or image.
 
+### Home, revised 2026-11-06
+
+The hero is one dark card (`--ae-rail-bg`), left-aligned, "Become a customer" first and a generic bearing drawing
+beside the words. One slot sits under it. Live promos take it, each an Instagram post (best 1080 × 1350, 4:5; 1:1
+and 3:4 fit) shown whole and never cropped, with its title, text and end date beside it as text, and the
+categories stand as cards below. With no live promo the categories take the slot as a carousel under a tab strip,
+so a category never shows twice. Previous and next stand on the slide's left and right edges. The brand list left
+the home (it stays on the about page) and the roadmap left the header (it stays in the footer). Promos carry no
+rupiah figure: the site never shows a price, and the page's test cannot read the inside of an image, so the
+Website Images screen says so. Parallax is CSS only (DESIGN.md, Motion).
+
 ## 5. Portal: global stock (the user's note)
 - `Reservations::availableAnywhere(itemId)`: on hand minus held, summed over active
   warehouses. `CartEstimate::availability()` and the Catalogue badge read it instead of the

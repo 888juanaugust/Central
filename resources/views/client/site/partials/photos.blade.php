@@ -1,6 +1,6 @@
 {{-- The gallery: whatever the Owner wants seen, the goods, the warehouse, the team. Captions in the language being spoken. --}}
 @php use App\Client\Site\Copy; @endphp
-<section class="site-section" data-reveal>
+<section class="site-section">
     <h2 class="site-h2">{{ __('In pictures') }}</h2>
     <ul class="site-gallery">
         @foreach ($photos as $photo)

@@ -3,7 +3,7 @@
 @php use App\Client\Site\Copy; @endphp
 
 @section('title', __('Roadmap'))
-@section('description', __('What :name has built and what comes next.', ['name' => Copy::name()]))
+@section('description', __('What :name has built and what comes next.', ['name' => Copy::shortName()]))
 
 @section('content')
 

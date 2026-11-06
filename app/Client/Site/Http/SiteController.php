@@ -9,6 +9,7 @@ use App\Client\Site\Copy;
 use App\Client\Site\Legal;
 use App\Domain\Shared\Locales;
 use App\Models\Company\Branch;
+use App\Models\Company\PaymentTerm;
 use Filament\Facades\Filament;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Response;
@@ -19,13 +20,55 @@ class SiteController
 {
     public function home(): View
     {
+        $categories = Copy::records('categories');
+        $branches = $this->branches();
+        $term = PaymentTerm::default();
+
         return view('client.site.home', [
             'promos' => SiteImage::query()->live(SiteImage::PROMO)->get(),
             'photos' => SiteImage::query()->live(SiteImage::PHOTO)->get(),
-            'categories' => Copy::records('categories'),
+            'categories' => $categories,
             'partners' => array_slice(Copy::records('partners'), 0, 3),
-            'branches' => $this->branches(),
+            'branches' => $branches,
+            'facts' => $this->facts(count($categories), $branches->count(), $term),
+            'faq' => $this->faq($term),
         ]);
+    }
+
+    /**
+     * The company at a glance, read from the system rather than typed: what it sells, the
+     * brands, the branches it ships from, and the credit term of the default payment term.
+     *
+     * @return list<array{value: string, label: string}>
+     */
+    private function facts(int $categories, int $branches, ?PaymentTerm $term): array
+    {
+        return array_values(array_filter([
+            $categories > 0 ? ['value' => (string) $categories, 'label' => __('Product categories')] : null,
+            ['value' => (string) count(Copy::list('brands')), 'label' => __('Brands')],
+            $branches > 0 ? ['value' => (string) $branches, 'label' => __('Branches')] : null,
+            $term && $term->due_days > 0 ? ['value' => __(':days days', ['days' => $term->due_days]), 'label' => __('Credit term')] : null,
+        ]));
+    }
+
+    /**
+     * The questions, their numbers filled from the system so they never drift from the terms
+     * page: :credit_days from the default payment term (30 when none is set, the company's
+     * standard), :claim_days from the terms of sale.
+     *
+     * @return list<array{question: string, answer: string}>
+     */
+    private function faq(?PaymentTerm $term): array
+    {
+        $numbers = [
+            ':credit_days' => (string) ($term && $term->due_days > 0 ? $term->due_days : 30),
+            ':claim_days' => (string) (int) Copy::value('legal.terms.claim_days'),
+        ];
+
+        return array_values(array_filter(array_map(fn (array $item): array => [
+            'question' => trim((string) ($item['question'] ?? '')),
+            'answer' => strtr(trim((string) ($item['answer'] ?? '')), $numbers),
+        ], Copy::records('faq')), fn (array $item): bool => $item['question'] !== '' && $item['answer'] !== ''));
     }
 
     public function about(): View

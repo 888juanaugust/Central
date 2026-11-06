@@ -59,6 +59,15 @@ return [
         'projects' => false,
     ],
 
+    // The names people see. Staff work in "Central": the panel, its tabs and the mail it sends
+    // them. Customers see the trading name everywhere they look: the public site, the buyer
+    // portal and the mail sent to them. The customer name is the public site's short name, so
+    // the Owner can change it on the Website screen; this is its default.
+    'names' => [
+        'staff' => env('STAFF_NAME', 'Central'),
+        'customer' => env('CUSTOMER_NAME', 'Javaindo'),
+    ],
+
     // The panel's colours; any key left out keeps the base's (DESIGN.md).
     'theme' => [
         'colors' => [

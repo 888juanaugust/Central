@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Client\Modules;
 
 use App\Client\Console\DeliveryWatchCommand;
+use App\Client\Console\ImportStaffCommand;
 use App\Client\Console\ReshapeGroupsCommand;
 use App\Client\Domain\Orders\DeliveryWatch;
 use App\Client\Domain\Orders\SeatApproval;
@@ -91,7 +92,7 @@ final class OrdersModule extends BaseModule
 
     public static function commands(): array
     {
-        return [ReshapeGroupsCommand::class, DeliveryWatchCommand::class];
+        return [ReshapeGroupsCommand::class, DeliveryWatchCommand::class, ImportStaffCommand::class];
     }
 
     public static function defaultSeeders(): array

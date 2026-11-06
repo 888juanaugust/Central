@@ -58,9 +58,18 @@ use Illuminate\View\View;
  */
 class AdminPanelProvider extends PanelProvider
 {
-    /** The company's name from Preferences, else the app name; never fails, the login page needs it before anything else works. */
+    /**
+     * The staff panel's name: the client's staff name when it sets one (config/client.php
+     * names.staff), else the company's name from Preferences, else the app name; never fails,
+     * the login page needs it before anything else works.
+     */
     public static function brandName(): string
     {
+        $staff = trim((string) config('client.names.staff', ''));
+        if ($staff !== '') {
+            return $staff;
+        }
+
         $company = rescue(fn () => (string) app(Preferensi::class)->get(PreferensiKey::CompanyName), '', false);
 
         return trim($company) !== '' ? $company : (string) config('app.name');

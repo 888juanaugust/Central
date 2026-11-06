@@ -61,6 +61,14 @@ sudo chown -R central:www-data storage bootstrap/cache && sudo chmod -R 775 stor
 systemctl reload caddy                       # once the domain's A record points here
 ```
 
+Staff logins in bulk: write a CSV on the server with the header `email,role,name,branches`
+(role `finance`, `marketing`, `sales`, `purchasing`, `warehouse` or blank; branches as codes
+separated by `|`, blank for the default branch; marketing always gets every branch), then
+`php artisan central:import-staff staff.csv --dry-run` and the same without `--dry-run`. Each
+login gets its own temporary password, printed once and changed at the first sign-in; a
+mailbox password is never asked for or reused. An existing login is left as it is. Hand
+the passwords over privately and delete the CSV.
+
 The administrator chooses a password at the first sign-in. Then, in Preferences →
 Restrictions, turn on **Administrators sign in with a second factor**; each
 administrator sets up an authenticator app on their profile before anything else opens.
@@ -72,7 +80,8 @@ is the same list on the command line and exits 0 only when nothing is.
 `deploy/Caddyfile`, installed by `provision.sh` with the domain filled in. Caddy gets and
 renews the certificate. The application sends its own security headers (content policy,
 frame and content-type rules, referrer policy, HSTS over HTTPS); nothing conflicting goes
-in Caddy.
+in Caddy. `www.` gets its own certificate and a permanent redirect to the bare domain, so
+point both `@` and `www` at the server.
 
 ## 5. Queue worker and scheduler
 

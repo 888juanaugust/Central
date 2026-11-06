@@ -16,7 +16,8 @@
 
     $locale = app()->getLocale();
     $other = Copy::otherLanguage();
-    $name = Copy::name();
+    // Customers know the trading name (Javaindo); the legal name stays in the schema and on the about and legal pages.
+    $name = Copy::shortName();
     $title = trim($__env->yieldContent('title'));
     $description = trim($__env->yieldContent('description')) ?: Copy::text('summary');
     $menu = [
@@ -61,6 +62,7 @@
         '@context' => 'https://schema.org',
         '@type' => 'Organization',
         'name' => $name,
+        'legalName' => Copy::name(),
         'url' => url('/'),
         'telephone' => (string) Copy::value('contact.phone'),
         'email' => (string) Copy::value('contact.email'),
@@ -71,6 +73,8 @@
             'telephone' => $b->phone_number ?: null,
         ]))->values()->all(),
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?></script>
+
+    @stack('schema')
 
     @vite(['resources/css/site.css', 'resources/js/site.js'])
 </head>
@@ -154,6 +158,9 @@
             <p>{{ __('Wholesale only. Prices are set per customer and never shown publicly.') }}</p>
         </div>
     </footer>
+
+    @include('client.site.partials.whatsapp', ['whatsapp' => Copy::whatsapp()])
+    @include('client.site.partials.cookie-notice')
 
 </body>
 </html>

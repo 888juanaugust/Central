@@ -64,3 +64,23 @@ for (const carousel of document.querySelectorAll('[data-carousel]')) {
     show(0);
     start();
 }
+
+// Cookie notice: said once. The acknowledgement lives in local storage (never a cookie, which
+// would itself need naming); storage blocked means the notice shows and closes for this page.
+const notice = document.querySelector('[data-site-notice]');
+if (notice) {
+    let seen = false;
+    try { seen = window.localStorage.getItem('site-notice') === '1'; } catch { /* storage blocked */ }
+    if (!seen) {
+        notice.hidden = false;
+        document.body.classList.add('has-notice');
+        requestAnimationFrame(() => requestAnimationFrame(() => notice.classList.add('is-in')));
+        notice.querySelector('[data-site-notice-close]')?.addEventListener('click', () => {
+            try { window.localStorage.setItem('site-notice', '1'); } catch { /* storage blocked */ }
+            document.body.classList.remove('has-notice');
+            notice.classList.remove('is-in');
+            const close = () => { notice.hidden = true; };
+            if (reduceMotion) { close(); } else { notice.addEventListener('transitionend', close, { once: true }); window.setTimeout(close, 400); }
+        });
+    }
+}

@@ -1,7 +1,7 @@
 ## Project
 
 **Central** is the company system of an Indonesian B2B wholesaler of automotive spare
-parts: a registered PT with an NIB, selling on credit to bengkel, toko sparepart and
+parts: a registered CV (commanditaire vennootschap) with an NIB, selling on credit to bengkel, toko sparepart and
 distributors — never to retail consumers. Brands carried: YUHOLI, OSBORN, ASTRO, STAVO,
 STAVIX, SERVO, BDAX. Categories: HYDRAULIC PART, SUSPENSION PART, ELECTRIC PART, BEARING
 PART. Three surfaces over one set of books:
@@ -9,6 +9,12 @@ PART. Three surfaces over one set of books:
 - **Admin panel** (`/admin`) — staff, role-scoped; worklists first, CRUD behind them
 - **Buyer portal** (`/portal`) — authenticated customers, their prices, reorder, invoices
 - **Public site** — open, indexed, bilingual, never shows a price
+
+Two names, one system. Staff see it as **Central** (`config('client.names.staff')`: the panel,
+its tabs, staff mail). Customers see the trading name **Javaindo** everywhere they look: the
+public site, the buyer portal and the mail sent to them (`Copy::shortName()`: the Website
+screen's short name, else `config('client.names.customer')`). The legal name (Preferences,
+the letterhead) stays on printed documents, the legal pages and the about page.
 
 Central runs on the **August ERP base** (`888juanaugust/AugustERP`): a standard, modular
 ERP for trading companies — accounting, inventory, purchasing, sales, cash and bank, fixed

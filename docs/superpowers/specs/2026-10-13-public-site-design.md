@@ -101,6 +101,10 @@ the home (it stays on the about page) and the roadmap left the header (it stays 
 rupiah figure: the site never shows a price, and the page's test cannot read the inside of an image, so the
 Website Images screen says so. Parallax is CSS only (DESIGN.md, Motion).
 
+Merged the same day with the landing page work of `2026-11-04-landing-page-design.md`: its glance, portal showcase, FAQ,
+WhatsApp button and cookie notice stay. The glance stands as a card under the hero, and the faint mark behind the
+hero gave way to the bearing.
+
 ## 5. Portal: global stock (the user's note)
 - `Reservations::availableAnywhere(itemId)`: on hand minus held, summed over active
   warehouses. `CartEstimate::availability()` and the Catalogue badge read it instead of the

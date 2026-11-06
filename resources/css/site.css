@@ -50,6 +50,9 @@
     --scale-large: 0.96;
     --site-band-accent: #97afee; /* The accent as DESIGN.md gives it on a dark ground: the hero stays dark in both themes. */
     --site-on-accent-soft: color-mix(in srgb, var(--ae-on-accent) 82%, transparent);
+    --site-glow: rgb(47 91 234 / 0.16);
+    --site-wa-bg: var(--ae-success-fg);
+    --site-wa-fg: var(--ae-on-accent);
     color-scheme: light dark;
 }
 
@@ -79,6 +82,8 @@
         --ae-tabstrip-line: #2a3142;
         --ae-tile-setup-bg: #1a1e29;
         --ae-tile-setup-fg: #a3b6e8;
+        --site-glow: rgb(151 175 238 / 0.12);
+        --site-wa-fg: var(--ae-canvas);
     }
 }
 
@@ -478,6 +483,16 @@
         width: 1rem;
         height: 1rem;
     }
+    .site-chip {
+        display: inline-block;
+        padding: 0.2rem 0.625rem;
+        border-radius: var(--ae-radius-full);
+        background: var(--ae-surface);
+        border: 1px solid var(--ae-card-edge);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--ae-ink);
+    }
     .site-badge {
         display: inline-flex;
         align-items: center;
@@ -566,11 +581,6 @@
         flex-wrap: wrap;
         gap: 0.625rem;
         margin-top: 2rem;
-    }
-    .site-hero__branches {
-        margin-top: 1.5rem;
-        font-size: 0.875rem;
-        color: var(--ae-rail-icon);
     }
     .site-hero__drawing {
         display: block;
@@ -1102,7 +1112,8 @@
     /* Footer */
     .site-footer {
         margin-top: clamp(4rem, 8vw, 6.5rem);
-        padding: 0 1rem 2.5rem;
+        /* Room at the bottom for the WhatsApp button, so it never sits on the last line. */
+        padding: 0 1rem 5.5rem;
     }
     .site-footer__grid {
         margin-inline: auto;
@@ -1502,5 +1513,557 @@
     @keyframes site-drift {
         from { translate: 0 -2.25rem; }
         to { translate: 0 2.25rem; }
+    }
+}
+
+@layer components {
+    /* The mark in either theme: the light file on a light ground, its twin on a dark one. */
+    .site-mark--dark {
+        display: none;
+    }
+    @media (prefers-color-scheme: dark) {
+        .site-mark--light {
+            display: none;
+        }
+        .site-mark--dark {
+            display: block;
+        }
+    }
+
+    .site-hero__whatsapp {
+        position: relative;
+        margin-top: 1.125rem;
+        font-size: 0.9375rem;
+    }
+    .site-hero__whatsapp a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.25rem;
+        color: var(--ae-rail-icon);
+        text-decoration: none;
+        transition: color var(--duration-quick) var(--ease-smooth-out);
+    }
+    .site-hero__whatsapp a:hover {
+        color: var(--ae-rail-icon-active);
+        text-decoration: underline;
+    }
+    .site-hero__whatsapp svg {
+        width: 1.125rem;
+        height: 1.125rem;
+    }
+
+    /* The company at a glance: the mark beside the name, the facts in one ruled strip. */
+    .site-glance {
+        position: relative;
+        display: grid;
+        gap: 1.75rem;
+        width: min(100% - 2rem, 72rem);
+        margin: 0.875rem auto 0;
+        padding: clamp(1.5rem, 4vw, 2.25rem);
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+        text-align: left;
+    }
+    @media (min-width: 64rem) {
+        .site-glance {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr);
+            align-items: center;
+            column-gap: 3rem;
+        }
+    }
+    .site-glance__identity {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.25rem;
+    }
+    .site-glance__mark {
+        flex: none;
+        width: auto;
+        height: clamp(3.25rem, 6vw, 4.5rem);
+    }
+    .site-glance__name {
+        font-size: 1.1875rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
+        color: var(--ae-ink);
+        text-wrap: balance;
+    }
+    .site-glance__tagline {
+        margin-top: 0.25rem;
+        font-size: 0.9375rem;
+        color: var(--ae-muted);
+    }
+    .site-glance__serves {
+        margin-top: 0.875rem;
+        font-size: 0.875rem;
+        color: var(--ae-muted);
+        text-wrap: pretty;
+    }
+    .site-glance__facts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        overflow: hidden;
+        border: 1px solid var(--ae-line);
+        border-radius: var(--ae-radius-md);
+        background: var(--ae-line);
+    }
+    @media (min-width: 40rem) {
+        .site-glance__facts {
+            grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+        }
+    }
+    .site-glance__fact {
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: flex-end;
+        padding: 1rem 1.125rem;
+        background: var(--ae-surface);
+    }
+    .site-glance__fact dt {
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        color: var(--ae-muted);
+    }
+    .site-glance__fact dd {
+        font-size: 1.625rem;
+        font-weight: 600;
+        letter-spacing: -0.025em;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+        color: var(--ae-ink);
+    }
+    .site-glance__branches {
+        grid-column: 1 / -1;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--ae-line);
+        font-size: 0.8125rem;
+        color: var(--ae-muted);
+    }
+    .site-glance__branches > span:first-child {
+        margin-right: 0.25rem;
+    }
+
+    /* What the portal gives a buyer: a ruled list beside a picture of the reorder card. */
+    .site-portal {
+        display: grid;
+        gap: clamp(2.5rem, 6vw, 4.5rem);
+    }
+    @media (min-width: 56rem) {
+        .site-portal {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+            align-items: center;
+        }
+    }
+    .site-portal__list {
+        margin-top: 2rem;
+        border-top: 1px solid var(--ae-line);
+    }
+    .site-portal__item {
+        display: grid;
+        grid-template-columns: 2.5rem minmax(0, 1fr);
+        gap: 1rem;
+        padding: 1.125rem 0;
+        border-bottom: 1px solid var(--ae-line);
+    }
+    .site-portal__icon {
+        display: inline-flex;
+        width: 2.5rem;
+        height: 2.5rem;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--ae-radius-md);
+        background: var(--ae-accent-soft);
+        color: var(--ae-accent);
+    }
+    .site-portal__icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    .site-portal__title {
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--ae-ink);
+    }
+    .site-portal__text {
+        margin-top: 0.25rem;
+        font-size: 0.9375rem;
+        color: var(--ae-muted);
+        text-wrap: pretty;
+    }
+    .site-portal__copy > .site-link {
+        margin-top: 1.5rem;
+    }
+
+    .site-portal-mock {
+        position: relative;
+        margin: 0;
+    }
+    .site-portal-mock::before {
+        content: '';
+        position: absolute;
+        inset: 8% 0 -6% 8%;
+        border-radius: 32px;
+        background: radial-gradient(ellipse at 70% 60%, var(--site-glow), transparent 70%);
+        pointer-events: none;
+    }
+    .site-portal-mock__window {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-canvas);
+        box-shadow: var(--ae-shadow-pop);
+    }
+    .site-portal-mock__bar {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        height: 2.25rem;
+        padding: 0 1rem;
+        border-bottom: 1px solid var(--ae-line);
+        background: var(--ae-surface);
+    }
+    .site-portal-mock__bar span {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: var(--ae-radius-full);
+        background: var(--ae-line);
+    }
+    .site-portal-mock__body {
+        display: grid;
+        gap: 0.875rem;
+        padding: clamp(1rem, 3vw, 1.5rem);
+    }
+    .site-portal-mock__credit,
+    .site-portal-mock__card {
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius-md);
+        background: var(--ae-surface);
+    }
+    .site-portal-mock__credit {
+        padding: 0.875rem 1rem;
+    }
+    .site-portal-mock__credit-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8125rem;
+        color: var(--ae-muted);
+    }
+    .site-portal-mock__percent {
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--ae-ink);
+    }
+    .site-portal-mock__meter {
+        height: 0.5rem;
+        margin-top: 0.625rem;
+        overflow: hidden;
+        border-radius: var(--ae-radius-full);
+        background: var(--ae-neutral-bg);
+    }
+    .site-portal-mock__meter span {
+        display: block;
+        width: 64%;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--ae-accent-fill);
+    }
+    .site-portal-mock__card {
+        padding: 1rem;
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-portal-mock__head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    .site-portal-mock__title {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--ae-ink);
+    }
+    .site-portal-mock__meta {
+        flex: none;
+        white-space: nowrap;
+        font-size: 0.75rem;
+        font-variant-numeric: tabular-nums;
+        color: var(--ae-muted);
+    }
+    .site-portal-mock__lines {
+        margin-top: 0.5rem;
+    }
+    .site-portal-mock__line {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto 2.25rem;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.625rem 0;
+        border-top: 1px solid var(--ae-line);
+    }
+    .site-portal-mock__line:first-child {
+        border-top: 0;
+    }
+    .site-portal-mock__name {
+        overflow: hidden;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--ae-ink);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .site-portal-mock__brand {
+        font-size: 0.6875rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: var(--ae-muted);
+    }
+    .site-portal-mock__qty {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--ae-line);
+        border-radius: var(--ae-radius-sm);
+        font-size: 0.8125rem;
+    }
+    .site-portal-mock__step {
+        width: 1.5rem;
+        color: var(--ae-muted);
+        text-align: center;
+    }
+    .site-portal-mock__num {
+        min-width: 2rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--ae-ink);
+        text-align: center;
+    }
+    .site-portal-mock__unit {
+        font-size: 0.75rem;
+        color: var(--ae-muted);
+    }
+    .site-portal-mock__send {
+        display: block;
+        margin-top: 0.875rem;
+        padding: 0.625rem;
+        border-radius: var(--ae-radius-sm);
+        background: var(--ae-accent-fill);
+        box-shadow: var(--ae-shadow-btn);
+        color: var(--ae-on-accent);
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    /* Questions: a ruled list that opens in place, the heading held beside it on a wide screen. */
+    .site-faq {
+        display: grid;
+        gap: 2rem;
+    }
+    @media (min-width: 56rem) {
+        .site-faq {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+            align-items: start;
+            gap: 4rem;
+        }
+        .site-faq__head {
+            position: sticky;
+            top: 6rem;
+        }
+    }
+    .site-faq__list {
+        border-top: 1px solid var(--ae-line);
+    }
+    .site-faq__item {
+        border-bottom: 1px solid var(--ae-line);
+    }
+    .site-faq__question {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        padding: 1.25rem 0;
+        font-size: 1.0625rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--ae-ink);
+        cursor: pointer;
+        list-style: none;
+    }
+    .site-faq__question::-webkit-details-marker {
+        display: none;
+    }
+    .site-faq__toggle {
+        flex: none;
+        width: 1.25rem;
+        height: 1.25rem;
+        color: var(--ae-muted);
+        transition: transform var(--duration-fast) var(--ease-smooth-out), color var(--duration-quick) var(--ease-smooth-out);
+    }
+    .site-faq__question:hover .site-faq__toggle {
+        color: var(--ae-accent);
+    }
+    .site-faq__item[open] .site-faq__toggle {
+        transform: rotate(45deg);
+        color: var(--ae-accent);
+    }
+    .site-faq__answer {
+        padding: 0 2.75rem 1.375rem 0;
+    }
+    .site-faq__answer p {
+        max-width: 62ch;
+        color: var(--ae-muted);
+        text-wrap: pretty;
+    }
+    /* The answer opens by height where the browser can animate to auto; elsewhere it simply appears. */
+    @supports selector(::details-content) {
+        .site-faq__item {
+            interpolate-size: allow-keywords;
+        }
+        .site-faq__item::details-content {
+            block-size: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: block-size var(--duration-medium) var(--ease-smooth-out), opacity var(--duration-fast) var(--ease-smooth-out), content-visibility var(--duration-medium) allow-discrete;
+        }
+        .site-faq__item[open]::details-content {
+            block-size: auto;
+            opacity: 1;
+        }
+    }
+
+    /* WhatsApp: one way to ask, held in the corner of every page. */
+    .site-whatsapp {
+        position: fixed;
+        right: max(1rem, env(safe-area-inset-right));
+        bottom: max(1rem, env(safe-area-inset-bottom));
+        z-index: 40;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: var(--ae-radius-full);
+        background: var(--site-wa-bg);
+        box-shadow: var(--ae-shadow-pop);
+        color: var(--site-wa-fg);
+        text-decoration: none;
+        transition: transform var(--duration-fast) var(--ease-smooth-out), opacity var(--duration-fast) var(--ease-smooth-out), box-shadow var(--duration-fast) var(--ease-smooth-out);
+    }
+    .site-whatsapp:hover {
+        transform: translateY(-2px);
+    }
+    .site-whatsapp:active {
+        transform: scale(0.96);
+    }
+    .site-whatsapp svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    .site-whatsapp__label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+    @media (min-width: 48rem) {
+        .site-whatsapp {
+            width: auto;
+            height: 3rem;
+            padding: 0 1.25rem 0 1rem;
+        }
+        .site-whatsapp svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+        .site-whatsapp__label {
+            position: static;
+            width: auto;
+            height: auto;
+            overflow: visible;
+            clip-path: none;
+            font-size: 0.9375rem;
+            font-weight: 600;
+        }
+    }
+    /* On a phone the notice takes the bottom of the screen; the button steps aside until it is read. */
+    @media (max-width: 47.99rem) {
+        .has-notice .site-whatsapp {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(0.75rem);
+        }
+    }
+
+    /* The cookie notice: a quiet card in the corner, said once. */
+    .site-notice {
+        position: fixed;
+        left: max(1rem, env(safe-area-inset-left));
+        right: max(1rem, env(safe-area-inset-right));
+        bottom: max(1rem, env(safe-area-inset-bottom));
+        z-index: 50;
+        display: grid;
+        gap: 0.875rem;
+        max-width: 30rem;
+        padding: 1.125rem 1.25rem;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-pop);
+    }
+    @media (min-width: 48rem) {
+        .site-notice {
+            right: auto;
+            left: 1.5rem;
+            bottom: 1.5rem;
+        }
+    }
+    .site-notice__title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--ae-ink);
+    }
+    .site-notice__body {
+        margin-top: 0.25rem;
+        font-size: 0.8125rem;
+        line-height: 1.55;
+        color: var(--ae-muted);
+        text-wrap: pretty;
+    }
+    .site-notice__actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 1rem;
+    }
+    /* A finger needs a 44px target; the small button grows on a touch screen. */
+    @media (pointer: coarse) {
+        .site-notice .site-btn {
+            min-height: 2.75rem;
+        }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+        .site-notice {
+            opacity: 0;
+            transform: translateY(0.75rem);
+            transition: opacity var(--duration-medium) var(--ease-smooth-out), transform var(--duration-medium) var(--ease-smooth-out);
+        }
+        .site-notice.is-in {
+            opacity: 1;
+            transform: none;
+        }
     }
 }

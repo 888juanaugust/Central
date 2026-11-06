@@ -1,6 +1,10 @@
 @extends('client.site.layout')
 
-@php use App\Client\Site\Copy; @endphp
+@php
+    use App\Client\Site\Copy;
+
+    $whatsapp = Copy::whatsapp();
+@endphp
 
 @section('description', Copy::text('summary'))
 
@@ -15,12 +19,16 @@
                 <a href="{{ route('site.contact') }}" class="site-btn site-btn--primary site-btn--lg">{{ __('Become a customer') }}</a>
                 <a href="{{ route('site.sign_in') }}" class="site-btn site-btn--secondary site-btn--lg">{{ __('Sign in to your account') }}</a>
             </div>
-            @if ($branches->isNotEmpty())
-                <p class="site-hero__branches">{{ __('Shipping from :count branches:', ['count' => $branches->count()]) }} {{ $branches->pluck('name')->join(', ') }}</p>
+            @if ($whatsapp)
+                <p class="site-hero__whatsapp">
+                    <a href="{{ $whatsapp }}" target="_blank" rel="noopener">@include('client.site.partials.whatsapp-icon')<span>{{ __('Or message us on WhatsApp') }}</span></a>
+                </p>
             @endif
         </div>
         @include('client.site.partials.drawings.hero-bearing', ['class' => 'site-hero__drawing', 'spin' => 'site-hero__spin'])
     </section>
+
+    @include('client.site.partials.glance')
 
     {{-- One slot under the hero. Live promos take it and the categories stand as cards; with none, the categories take it. A category never shows twice. --}}
     @if ($promos->isNotEmpty())
@@ -29,6 +37,8 @@
     @else
         @includeWhen(count($categories) > 0, 'client.site.partials.category-carousel')
     @endif
+
+    @include('client.site.partials.portal-features')
 
     {{-- Who buys from us, and how an account opens: the distance between interested and ordering. --}}
     <section class="site-section">
@@ -96,6 +106,8 @@
             </div>
         </div>
     </section>
+
+    @includeWhen($faq !== [], 'client.site.partials.faq')
 
     {{-- The closing action: flat accent, the one blue surface on the page, the second door for those already in. --}}
     <section class="site-section">

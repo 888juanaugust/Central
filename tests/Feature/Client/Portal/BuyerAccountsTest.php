@@ -62,7 +62,7 @@ class BuyerAccountsTest extends TestCase
         Mail::assertQueued(PortalInvitation::class, function (PortalInvitation $mail) use ($buyer, &$url): bool {
             $url = $mail->url;
 
-            return $mail->hasTo('budi@toko.test') && $mail->buyer->is($buyer) && str_contains($mail->url, '/portal/password-reset/reset') && str_contains($mail->url, 'signature=');
+            return $mail->hasTo('budi@toko.test') && $mail->hasFrom((string) config('mail.from.address'), 'Javaindo') && $mail->hasSubject('Your portal account at Javaindo') && $mail->buyer->is($buyer) && str_contains($mail->url, '/portal/password-reset/reset') && str_contains($mail->url, 'signature=');
         });
         $this->assertStringContainsString($buyer->name, (new PortalInvitation($buyer, (string) $url))->render());
         auth()->forgetUser();

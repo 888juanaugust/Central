@@ -10,7 +10,9 @@ use App\Client\Portal\Filament\Pages\EditPortalProfile;
 use App\Client\Portal\Filament\Pages\Home;
 use App\Client\Portal\Http\DocumentController;
 use App\Client\Portal\Http\EndInactiveBuyerSessions;
+use App\Client\Portal\Http\PortalBrand;
 use App\Client\Portal\Http\PortalLocale;
+use App\Client\Site\Copy;
 use App\Domain\Audit\Auditor;
 use App\Filament\Support\InitialsAvatar;
 use App\Providers\Filament\AdminPanelProvider;
@@ -85,8 +87,9 @@ class PortalPanelProvider extends PanelProvider
             ->passwordReset()
             ->profile(EditPortalProfile::class, isSimple: true)
             ->defaultAvatarProvider(InitialsAvatar::class)
-            ->brandName(fn (): string => AdminPanelProvider::brandName().' · '.__('Portal'))
-            ->brandLogo(fn (): View => AdminPanelProvider::brand(AdminPanelProvider::brandName().' · '.__('Portal')))
+            // Customers see the trading name (Javaindo), never the staff system's.
+            ->brandName(fn (): string => Copy::shortName().' · '.__('Portal'))
+            ->brandLogo(fn (): View => AdminPanelProvider::brand(Copy::shortName().' · '.__('Portal')))
             ->brandLogoHeight('1.75rem')
             ->favicon(fn (): string => asset((string) config('client.theme.logo', 'images/logo.svg')))
             ->colors(array_merge([
@@ -129,7 +132,7 @@ class PortalPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-            ->middleware([EndInactiveBuyerSessions::class, PortalLocale::class], isPersistent: true)
+            ->middleware([EndInactiveBuyerSessions::class, PortalLocale::class, PortalBrand::class], isPersistent: true)
             ->authMiddleware([Authenticate::class], isPersistent: true);
     }
 }

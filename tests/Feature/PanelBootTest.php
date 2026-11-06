@@ -13,10 +13,14 @@ class PanelBootTest extends TestCase
 {
     public function test_the_login_page_carries_the_app_name_until_a_company_is_named(): void
     {
+        config(['client.names.staff' => '']); // the base's own rule, without a client's staff name
         $this->get('/admin/login')->assertOk()->assertSee(config('app.name'));
 
         app(Preferensi::class)->set(PreferensiKey::CompanyName, 'Example Co');
         $this->get('/admin/login')->assertOk()->assertSee('Example Co');
+
+        config(['client.names.staff' => 'Central']); // a client's staff name wins over the company's
+        $this->get('/admin/login')->assertOk()->assertSee('Central')->assertDontSee('Example Co');
     }
 
     public function test_an_active_administrator_reaches_the_dashboard(): void

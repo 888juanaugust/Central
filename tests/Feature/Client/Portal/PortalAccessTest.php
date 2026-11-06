@@ -25,9 +25,10 @@ class PortalAccessTest extends TestCase
 
     public function test_the_login_page_carries_the_company_name_and_the_reset_link(): void
     {
-        app(Preferensi::class)->set(PreferensiKey::CompanyName, 'Central Parts');
+        app(Preferensi::class)->set(PreferensiKey::CompanyName, 'CV Javaindo');
 
-        $this->get('/portal/login')->assertOk()->assertSee('Central Parts')->assertSee('Portal');
+        // Customers see the trading name, never the staff system's or the legal name.
+        $this->get('/portal/login')->assertOk()->assertSee('Javaindo · Portal')->assertDontSee('Central');
         $this->get('/portal/password-reset/request')->assertOk();
         $this->get('/portal')->assertRedirect('/portal/login');
     }

@@ -3,7 +3,7 @@
 @php use App\Client\Site\Copy; @endphp
 
 @section('title', __('About us'))
-@section('description', __(':name: who we are, who we serve and how an account opens.', ['name' => Copy::name()]))
+@section('description', __(':name: who we are, who we serve and how an account opens.', ['name' => Copy::shortName()]))
 
 @section('content')
 

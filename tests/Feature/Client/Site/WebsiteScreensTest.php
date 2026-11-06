@@ -46,6 +46,18 @@ class WebsiteScreensTest extends TestCase
         $this->withCookie('bahasa', 'en')->get('/mitra')->assertOk()->assertSee('Main partner.')->assertSee('Supplier');
     }
 
+    public function test_the_faq_tab_saves_the_owners_questions_and_the_home_shows_them(): void
+    {
+        Livewire::test(Website::class)->assertOk()
+            ->fillForm(['faq' => [['question' => ['id' => 'Apakah ada minimum order?', 'en' => 'Is there a minimum order?'], 'answer' => ['id' => 'Tidak ada.', 'en' => 'There is none.']]]])
+            ->call('save')->assertHasNoFormErrors()->assertNotified();
+
+        $this->assertCount(1, Copy::value('faq'));
+        auth()->forgetUser();
+        $this->get('/')->assertOk()->assertSee('Apakah ada minimum order?')->assertSee('Tidak ada.');
+        $this->withCookie('bahasa', 'en')->get('/')->assertOk()->assertSee('Is there a minimum order?');
+    }
+
     public function test_website_images_upload_a_promo_and_a_photo_that_the_home_shows_while_live(): void
     {
         Storage::fake('public');

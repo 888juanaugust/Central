@@ -183,7 +183,9 @@ Same tokens, typeface, radii and shadows as the workspace; `resources/css/site.c
 because its content policy keeps it apart from Filament, and `SiteTokensTest` fails on a value that drifts or a
 colour outside them. Larger headings than a panel page, same family and weight. The hero is `--ae-rail-bg` in
 both themes; lists sit on white cards as tables do; the carousel's category strip is the workspace's tab strip;
-its plates use the Setup tile tint.
+its plates use the Setup tile tint. Inner pages open on the same dark card, shorter, with one generic drawing whose
+sink follows the home's; legal pages and sign-in keep the plain heading. A split card (the FAQ, the About profile)
+pairs white with the Setup tint and holds real content on both halves, never a drawing alone to fill a corner.
 
 ---
 

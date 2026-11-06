@@ -1,44 +1,50 @@
 @extends('client.site.layout')
 
-@php use App\Client\Site\Copy; @endphp
+@php
+    use App\Client\Site\Copy;
+
+    // A partner's tile: the first letters of its first two words, until partners carry logos.
+    $initials = fn (string $name): string => collect(preg_split('/\s+/u', trim($name)))
+        ->filter(fn (string $word): bool => preg_match('/^\p{L}/u', $word) === 1)
+        ->take(2)
+        ->map(fn (string $word): string => mb_strtoupper(mb_substr($word, 0, 1)))
+        ->implode('');
+@endphp
 
 @section('title', __('Partners'))
 @section('description', __('The suppliers, distributors and logistics partners :name works with.', ['name' => Copy::shortName()]))
 
 @section('content')
 
-    @include('client.site.partials.page-hero', ['title' => __('Partners'), 'lede' => __('The companies we build our supply and our reach with.')])
+    @include('client.site.partials.page-hero', ['title' => __('Partners'), 'lede' => __('The companies we build our supply and our reach with.'), 'drawing' => 'suspension'])
 
     <section class="site-section site-section--top">
-        <ul class="site-list">
+        <ul class="site-partners">
             @forelse ($partners as $partner)
-                <li class="site-list__row site-list__row--partner-full">
-                    <div>
-                        <h2 class="site-list__title site-list__title--lg">{{ $partner['name'] }}</h2>
-                        <p class="site-list__text">{{ $partner['description'] }}</p>
-                    </div>
-                    <div class="site-list__meta">
-                        <p class="site-list__strong">{{ $partner['field'] }}</p>
+                <li class="site-partner">
+                    <span class="site-partner__tile" aria-hidden="true">{{ $initials($partner['name']) }}</span>
+                    <h2 class="site-partner__name">{{ $partner['name'] }}</h2>
+                    <p class="site-partner__text">{{ $partner['description'] }}</p>
+                    <p class="site-partner__meta">
+                        <span class="site-partner__field">{{ $partner['field'] }}</span>
                         @if (! empty($partner['country']))
-                            <p>{{ $partner['country'] }}</p>
+                            <span>{{ $partner['country'] }}</span>
                         @endif
-                    </div>
-                    @if (! empty($partner['since']))
-                        <p class="site-list__meta site-list__meta--end">{{ __('Since :year', ['year' => $partner['since']]) }}</p>
-                    @endif
+                        @if (! empty($partner['since']))
+                            <span>{{ __('Since :year', ['year' => $partner['since']]) }}</span>
+                        @endif
+                    </p>
                 </li>
             @empty
-                <li class="site-list__row site-list__empty">{{ __('No partners listed yet.') }}</li>
+                <li class="site-partners__empty">{{ __('No partners listed yet.') }}</li>
             @endforelse
         </ul>
-
-        <div class="site-card site-card--row">
-            <div>
-                <h2 class="site-h3">{{ __('Work with us') }}</h2>
-                <p class="site-p">{{ __('Suppliers and regional distributors who want to carry or supply our brands are welcome to get in touch.') }}</p>
-            </div>
-            <a href="{{ route('site.contact') }}" class="site-btn site-btn--primary">{{ __('Contact us') }}</a>
-        </div>
     </section>
+
+    @include('client.site.partials.closing-band', [
+        'title' => __('Work with us'),
+        'lede' => __('Suppliers and regional distributors who want to carry or supply our brands are welcome to get in touch.'),
+        'action' => __('Contact us'),
+    ])
 
 @endsection

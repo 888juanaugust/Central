@@ -57,6 +57,7 @@ class SiteImageResource extends MasterResource
                     ->helperText(__('A promo is a slide of the carousel with a title, a text and a link; a photo goes in the gallery with its caption.')),
                 FileUpload::make('image_path')->label(__('Image'))->image()->disk('public')->directory('promo')->visibility('public')
                     ->maxSize(2048)->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->required()->imageEditor()->columnSpanFull()
+                    ->helperText(fn (Get $get): ?string => $get('kind') === SiteImage::PROMO ? __('An Instagram post fits best: 1080 × 1350 px (4:5), shown whole and never cropped. JPG, PNG or WebP, up to 2 MB. No prices in the image: the public site never shows one.') : null)
                     // The stored name's extension comes from the file's content, never from the name the browser sent.
                     ->getUploadedFileNameForStorageUsing(fn (TemporaryUploadedFile $file): string => Str::ulid().'.'.($file->guessExtension() ?: 'bin')),
                 TextInput::make('title.id')->label(__('Title (Bahasa Indonesia)'))->required()->maxLength(120),

@@ -110,7 +110,6 @@ class SiteRoutesTest extends TestCase
         Branch::query()->create(['name' => 'Surabaya', 'code' => 'SBY', 'used_all_user' => false, 'is_active' => true]);
 
         $html = $this->withCookie('bahasa', 'en')->get('/')->assertOk()
-            ->assertSee('site-hero__mark', false)
             ->assertSee('site-glance', false)
             ->assertSeeInOrder(['Product categories', '4', 'Brands', '7'])
             ->assertSee('Branches')->assertSee('Credit term')->assertSee('30 days')

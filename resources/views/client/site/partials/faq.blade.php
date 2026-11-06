@@ -1,5 +1,5 @@
 {{-- The questions a buyer asks before opening an account. <details> opens without a script; the numbers come from the system. --}}
-<section class="site-section" data-reveal>
+<section class="site-section">
     <div class="site-faq">
         <div class="site-faq__head">
             <h2 class="site-h2">{{ __('Frequently asked questions') }}</h2>

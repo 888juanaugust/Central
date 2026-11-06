@@ -37,7 +37,7 @@ if (reduceMotion || !('IntersectionObserver' in window)) {
     targets.forEach((el) => io.observe(el));
 }
 
-// Promo carousel: rotates the slides, pauses on hover and focus, stops under reduced motion.
+// Carousel, promos or categories: rotates the slides, pauses on hover and focus, stops under reduced motion.
 for (const carousel of document.querySelectorAll('[data-carousel]')) {
     const slides = Array.from(carousel.querySelectorAll('[data-slide]'));
     const dots = Array.from(carousel.querySelectorAll('[data-dot]'));

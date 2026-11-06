@@ -21,7 +21,7 @@
         ['STAVO', __('Ignition coil'), '6', 'PCS'],
     ];
 @endphp
-<section class="site-section" data-reveal>
+<section class="site-section">
     <div class="site-portal">
         <div class="site-portal__copy">
             <h2 class="site-h2">{{ __('What you get after sign-in') }}</h2>

@@ -173,6 +173,17 @@ motion does, never by the nearest number. Closing is quicker than opening; nothi
   JavaScript animation, because CSS cannot move siblings when one leaves; GSAP is bundled by Vite, never a CDN.
 - **Press**: buttons, tiles and rail buttons scale to .96 while pressed.
 - **Reduced motion**: the state still changes (colour, visibility), travel and scale do not.
+- **Public home**: parallax, CSS scroll-driven animations only, no JavaScript: the hero's bearing sinks and turns
+  with the scroll, the drawings drift against their cards, a promo poster never moves. Without scroll timelines
+  or under reduced motion the page stands still. Clip a parallax card with `overflow: clip`, not `hidden`.
+
+### The public site
+
+Same tokens, typeface, radii and shadows as the workspace; `resources/css/site.css` repeats the tokens it uses
+because its content policy keeps it apart from Filament, and `SiteTokensTest` fails on a value that drifts or a
+colour outside them. Larger headings than a panel page, same family and weight. The hero is `--ae-rail-bg` in
+both themes; lists sit on white cards as tables do; the carousel's category strip is the workspace's tab strip;
+its plates use the Setup tile tint.
 
 ---
 

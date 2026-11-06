@@ -105,6 +105,15 @@ Merged the same day with the landing page work of `2026-11-04-landing-page-desig
 WhatsApp button and cookie notice stay. The glance stands as a card under the hero, and the faint mark behind the
 hero gave way to the bearing.
 
+### Inner pages, revised 2026-11-06
+
+About, Partners, Contact and Roadmap open on a shorter dark card with one generic drawing: a hydraulic cylinder, a
+damper, a spark plug and a bearing. Legal pages and sign-in keep the plain heading. On About the profile and the
+company's details share one split card, the categories stand in a row of plates, the audience in three cells and the
+steps on one joined line, and the page closes on the blue band. Partners take a tile of their initials until they
+carry logos, and "Work with us" becomes the blue band. The FAQ is one split card with its first answer open. No copy
+changed.
+
 ## 5. Portal: global stock (the user's note)
 - `Reservations::availableAnywhere(itemId)`: on hand minus held, summed over active
   warehouses. `CartEstimate::availability()` and the Catalogue badge read it instead of the

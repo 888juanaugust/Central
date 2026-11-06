@@ -7,7 +7,7 @@
 
 @section('content')
 
-    @include('client.site.partials.page-hero', ['title' => __('Contact'), 'lede' => __('To open a wholesale account or to reach your branch.')])
+    @include('client.site.partials.page-hero', ['title' => __('Contact'), 'lede' => __('To open a wholesale account or to reach your branch.'), 'drawing' => 'electric'])
 
     <section class="site-section site-section--top">
         <div class="site-two-col">

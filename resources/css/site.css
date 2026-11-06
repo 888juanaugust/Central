@@ -224,10 +224,6 @@
             grid-template-columns: 5fr 7fr;
             gap: 5rem;
         }
-        .site-two-col--wide-left {
-            grid-template-columns: 8fr 4fr;
-            gap: 4rem;
-        }
     }
     .site-row-head {
         display: flex;
@@ -539,6 +535,9 @@
     }
     .site-hero__drawing :is(path, circle),
     .site-cta__drawing :is(path, circle),
+    .site-faq__drawing :is(path, circle),
+    .site-page-hero__drawing > :is(path, circle, rect),
+    .site-plate__drawing > :is(path, circle, rect),
     .site-promo__drawing > :is(path, circle, rect),
     .site-category__drawing > :is(path, circle, rect) {
         vector-effect: non-scaling-stroke;
@@ -764,7 +763,6 @@
     }
     @media (min-width: 40rem) {
         .site-list__row--partner { grid-template-columns: minmax(0, 1fr) 9rem 5.5rem; align-items: start; gap: 1.25rem; }
-        .site-list__row--partner-full { grid-template-columns: 1fr 12rem 7rem; align-items: start; gap: 2rem; }
         .site-list__row--roadmap { grid-template-columns: 8rem 1fr; gap: 2rem; }
         .site-list__row--branch { grid-template-columns: 12rem 1fr 11rem; align-items: center; gap: 1.5rem; }
     }
@@ -847,42 +845,8 @@
     .site-card--wide {
         padding: clamp(1.75rem, 4vw, 2.5rem);
     }
-    .site-card--row {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        margin-top: 3rem;
-        align-items: flex-start;
-    }
-    @media (min-width: 40rem) {
-        .site-card--row {
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-        }
-    }
     .site-card .site-btn {
         margin-top: 1.25rem;
-    }
-    .site-card--row .site-btn {
-        margin-top: 0;
-        flex-shrink: 0;
-    }
-    .site-facts {
-        margin-top: 1rem;
-        font-size: 0.875rem;
-    }
-    .site-facts > div {
-        padding: 0.75rem 0;
-        border-top: 1px solid var(--ae-line);
-    }
-    .site-facts dt {
-        color: var(--ae-muted);
-    }
-    .site-facts dd {
-        margin-top: 0.125rem;
-        font-weight: 500;
-        color: var(--ae-ink);
     }
 
     /* Closing band: flat accent, the panel's radius and card shadow, a faint bearing behind. */
@@ -977,6 +941,315 @@
         margin-top: 1.25rem;
         font-size: 0.875rem;
         color: var(--ae-muted);
+    }
+    /* The band of an inner page: the home's dark card, shorter. Legal pages and sign-in keep the plain heading. */
+    .site-page-hero--band {
+        position: relative;
+        overflow: clip;
+        margin-top: 1rem;
+        padding: clamp(2.25rem, 6vw, 4.25rem) clamp(1.25rem, 5vw, 3.5rem);
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-rail-bg);
+        color: var(--ae-rail-icon-active);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-page-hero--band .site-page-hero__title {
+        position: relative;
+        z-index: 1;
+        max-width: 15ch;
+        font-size: clamp(2.25rem, 1.4rem + 3.4vw, 3.75rem);
+        letter-spacing: -0.035em;
+        line-height: 1.04;
+    }
+    .site-page-hero--band .site-page-hero__lede {
+        position: relative;
+        z-index: 1;
+        max-width: 30rem;
+        color: var(--ae-rail-icon);
+    }
+    .site-page-hero__drawing {
+        display: block;
+        width: min(100%, 24rem);
+        margin: -0.5rem 0 -1.75rem auto;
+        color: var(--ae-rail-icon);
+        stroke: currentColor;
+        stroke-width: 1.5;
+    }
+    .site-page-hero__drawing .site-line--center {
+        stroke: var(--site-band-accent);
+    }
+    @media (min-width: 64rem) {
+        .site-page-hero__drawing {
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            width: clamp(18rem, 40vw, 36rem);
+            margin: 0;
+            transform: translateY(-50%);
+        }
+    }
+
+    /* The About profile: one split card, two real halves. The text on white, the company's details on the tint. */
+    .site-profile {
+        display: grid;
+        overflow: clip;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-profile__text {
+        padding: clamp(1.5rem, 4vw, 2.75rem);
+    }
+    .site-profile__text .site-h2 {
+        margin: 0 0 1rem;
+    }
+    .site-profile__text .site-p {
+        margin: 0;
+        max-width: 60ch;
+        font-size: 1.0625rem;
+    }
+    .site-profile__text .site-p + .site-p {
+        margin-top: 1rem;
+    }
+    .site-profile__text .site-p:first-of-type {
+        color: var(--ae-ink);
+    }
+    .site-profile__facts {
+        padding: clamp(1rem, 3vw, 2rem) clamp(1.5rem, 4vw, 2.75rem);
+        background: var(--ae-tile-setup-bg);
+    }
+    .site-profile__facts > div {
+        padding: 0.875rem 0;
+        border-bottom: 1px solid color-mix(in srgb, var(--ae-tile-setup-fg) 18%, transparent);
+    }
+    .site-profile__facts > div:last-child {
+        border-bottom: 0;
+    }
+    .site-profile__facts dt {
+        font-size: 0.8125rem;
+        color: var(--ae-muted);
+    }
+    .site-profile__facts dd {
+        margin-top: 0.1875rem;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        color: var(--ae-ink);
+        text-wrap: pretty;
+    }
+    @media (min-width: 56rem) {
+        .site-profile {
+            grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        }
+        .site-profile__facts {
+            display: grid;
+            align-content: center;
+        }
+    }
+
+    /* The categories in one row on the About page: the carousel's plate, the name under it. */
+    .site-plates {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.875rem;
+        margin-top: 1.5rem;
+    }
+    @media (min-width: 56rem) {
+        .site-plates {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+    }
+    .site-plate {
+        overflow: clip;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-plate__art {
+        display: grid;
+        place-items: center;
+        padding: 1rem;
+        background: var(--ae-tile-setup-bg);
+    }
+    .site-plate__drawing {
+        display: block;
+        width: 100%;
+        color: var(--ae-tile-setup-fg);
+        stroke: currentColor;
+        stroke-width: 1.5;
+    }
+    .site-plate__name {
+        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    /* Three short texts on one card, split by the line token. */
+    .site-cells {
+        display: grid;
+        overflow: clip;
+        margin-top: 1.5rem;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-cell {
+        padding: 1.5rem 1.75rem;
+        box-shadow: 0 -1px 0 var(--ae-line);
+    }
+    .site-cell__title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+    }
+    .site-cell__text {
+        margin-top: 0.5rem;
+        font-size: 0.9375rem;
+        color: var(--ae-muted);
+        text-wrap: pretty;
+    }
+    @media (min-width: 48rem) {
+        .site-cells {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .site-cell {
+            box-shadow: -1px 0 0 var(--ae-line);
+        }
+    }
+
+    /* Steps on one line, joined: their order is the point. */
+    .site-path {
+        display: grid;
+        gap: 1.5rem;
+        margin-top: 1.75rem;
+        list-style: none;
+    }
+    .site-path__step {
+        position: relative;
+    }
+    .site-path__number {
+        position: relative;
+        z-index: 1;
+        display: grid;
+        place-items: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--ae-radius-full);
+        background: var(--ae-accent-fill);
+        color: var(--ae-on-accent);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+    .site-path__title {
+        margin-top: 0.875rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: -0.015em;
+    }
+    .site-path__text {
+        margin-top: 0.375rem;
+        max-width: 32ch;
+        font-size: 0.9375rem;
+        color: var(--ae-muted);
+        text-wrap: pretty;
+    }
+    @media (min-width: 48rem) {
+        .site-path {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 2rem;
+        }
+        .site-path__step:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 1.25rem;
+            left: 2.5rem;
+            right: -2rem;
+            border-top: 1px dashed var(--ae-accent);
+        }
+    }
+
+    /* Partners: a white card of rows, each with the panel's tile until partners carry logos. */
+    .site-partners {
+        overflow: clip;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-partners__empty {
+        padding: 1.5rem 1.75rem;
+        color: var(--ae-muted);
+    }
+    .site-partner {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.25rem 1.25rem;
+        align-items: start;
+        padding: 1.5rem 1.75rem;
+        border-bottom: 1px solid var(--ae-line);
+    }
+    .site-partner:last-child {
+        border-bottom: 0;
+    }
+    .site-partner__tile {
+        grid-row: span 2;
+        display: grid;
+        place-items: center;
+        width: 3.25rem;
+        height: 3.25rem;
+        border-radius: var(--ae-radius-md);
+        background: var(--ae-tile-setup-bg);
+        color: var(--ae-tile-setup-fg);
+        font-size: 1.125rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+    .site-partner__name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+    .site-partner__text {
+        font-size: 0.9375rem;
+        color: var(--ae-muted);
+    }
+    .site-partner__meta {
+        grid-column: 2;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.875rem;
+        align-items: center;
+        margin-top: 0.625rem;
+        font-size: 0.875rem;
+        color: var(--ae-muted);
+    }
+    .site-partner__field {
+        padding: 0.1875rem 0.625rem;
+        border-radius: var(--ae-radius-full);
+        background: var(--ae-accent-soft);
+        color: var(--ae-accent);
+        font-size: 0.8125rem;
+        font-weight: 600;
+    }
+    @media (min-width: 48rem) {
+        .site-partner {
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            column-gap: 1.5rem;
+            align-items: center;
+        }
+        .site-partner__tile {
+            grid-row: 1 / span 2;
+        }
+        .site-partner__meta {
+            grid-column: 3;
+            grid-row: 1 / span 2;
+            justify-content: flex-end;
+            max-width: 24rem;
+            margin: 0;
+        }
     }
 
     /* Legal articles */
@@ -1471,14 +1744,15 @@
     }
 
     /*
-     * The home's one motion, CSS only: no script, nothing on the main thread to tune, so the strict content policy
+     * The site's one motion, CSS only: no script, nothing on the main thread to tune, so the strict content policy
      * and the bundle stay as they were. The bearing turns as the page scrolls, because that is what a bearing does;
      * the drawings drift against their cards. Where the browser lacks scroll timelines, or the visitor asks for
      * reduced motion, the page simply stands still. A poster never moves: its words have to be read.
      */
     @media (prefers-reduced-motion: no-preference) {
         @supports (animation-timeline: scroll()) {
-            .site-hero__drawing {
+            .site-hero__drawing,
+            .site-page-hero__drawing {
                 animation: site-sink linear both;
                 animation-timeline: scroll(root block);
                 animation-range: 0 100vh;
@@ -1864,27 +2138,72 @@
         text-align: center;
     }
 
-    /* Questions: a ruled list that opens in place, the heading held beside it on a wide screen. */
+    /* Questions: one split card, the make of a carousel slide. The heading and the way to ask on the tint, the list on white. */
     .site-faq {
         display: grid;
-        gap: 2rem;
+        grid-template-columns: minmax(0, 1fr);
+        overflow: clip;
+        border: 1px solid var(--ae-card-edge);
+        border-radius: var(--ae-radius);
+        background: var(--ae-surface);
+        box-shadow: var(--ae-shadow-card);
+    }
+    .site-faq__head {
+        position: relative;
+        overflow: clip;
+        padding: clamp(1.5rem, 4vw, 2.75rem);
+        padding-bottom: 5rem;
+        background: var(--ae-tile-setup-bg);
+    }
+    .site-faq__head > :not(.site-faq__drawing) {
+        position: relative;
+        z-index: 1;
+    }
+    .site-faq__head .site-btn {
+        height: auto;
+        min-height: 2.75rem;
+        margin-top: 1.5rem;
+        padding-block: 0.625rem;
+        text-align: left;
+        white-space: normal;
+    }
+    .site-faq__drawing {
+        position: absolute;
+        right: -3.5rem;
+        bottom: -4rem;
+        width: 12rem;
+        color: var(--ae-tile-setup-fg);
+        stroke: currentColor;
+        stroke-width: 1.25;
+        opacity: 0.35;
+        pointer-events: none;
     }
     @media (min-width: 56rem) {
         .site-faq {
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
-            align-items: start;
-            gap: 4rem;
+            grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
         }
         .site-faq__head {
-            position: sticky;
-            top: 6rem;
+            min-height: 30rem;
+            padding-bottom: clamp(1.5rem, 4vw, 2.75rem);
+        }
+        .site-faq__drawing {
+            right: -6.5rem;
+            bottom: -6.5rem;
+            width: 21rem;
+            opacity: 0.5;
         }
     }
     .site-faq__list {
-        border-top: 1px solid var(--ae-line);
+        padding: 0.5rem clamp(1.25rem, 3vw, 2.25rem);
     }
     .site-faq__item {
         border-bottom: 1px solid var(--ae-line);
+    }
+    .site-faq__item:last-child {
+        border-bottom: 0;
+    }
+    .site-faq__item[open] .site-faq__question {
+        color: var(--ae-accent);
     }
     .site-faq__question {
         display: flex;
@@ -1895,7 +2214,6 @@
         font-size: 1.0625rem;
         font-weight: 600;
         letter-spacing: -0.01em;
-        color: var(--ae-ink);
         cursor: pointer;
         list-style: none;
     }

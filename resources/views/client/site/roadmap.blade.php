@@ -7,7 +7,7 @@
 
 @section('content')
 
-    @include('client.site.partials.page-hero', ['title' => __('Roadmap'), 'lede' => __('What we have built for our customers, and what comes next.')])
+    @include('client.site.partials.page-hero', ['title' => __('Roadmap'), 'lede' => __('What we have built for our customers, and what comes next.'), 'drawing' => 'bearing'])
 
     <section class="site-section site-section--top site-section--narrow">
         <ol class="site-list">

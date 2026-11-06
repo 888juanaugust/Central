@@ -73,7 +73,7 @@ class SiteController
 
     public function about(): View
     {
-        return view('client.site.about');
+        return view('client.site.about', ['categories' => Copy::records('categories')]);
     }
 
     public function partners(): View

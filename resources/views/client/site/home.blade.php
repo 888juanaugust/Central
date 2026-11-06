@@ -109,19 +109,11 @@
 
     @includeWhen($faq !== [], 'client.site.partials.faq')
 
-    {{-- The closing action: flat accent, the one blue surface on the page, the second door for those already in. --}}
-    <section class="site-section">
-        <div class="site-cta">
-            @include('client.site.partials.drawings.hero-bearing', ['class' => 'site-cta__drawing', 'spin' => 'site-cta__spin'])
-            <div>
-                <h2 class="site-cta__title">{{ __('Open a wholesale account') }}</h2>
-                <p class="site-cta__lede">{{ __('Send your business name, city and the kind of parts you need.') }}</p>
-            </div>
-            <div class="site-cta__actions">
-                <a href="{{ route('site.contact') }}" class="site-btn site-btn--on-accent site-btn--lg">{{ __('Become a customer') }}</a>
-                <a href="{{ route('site.sign_in') }}" class="site-cta__link">{{ __('Already a customer? Sign in') }}</a>
-            </div>
-        </div>
-    </section>
+    @include('client.site.partials.closing-band', [
+        'title' => __('Open a wholesale account'),
+        'lede' => __('Send your business name, city and the kind of parts you need.'),
+        'action' => __('Become a customer'),
+        'signIn' => true,
+    ])
 
 @endsection
